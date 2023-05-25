@@ -10,6 +10,7 @@
 #include <QToolBar>
 #include <QStatusBar>
 #include <QTreeView>
+#include <QBoxLayout>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -36,6 +37,8 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    QVBoxLayout *mainLayout;
+
     AccountContainer accountContainer;
     JsonHandler jsonHandler;
     QString currentFilePath;
@@ -67,5 +70,6 @@ private:
     void openFile(const QString &filePath);
     void saveFile(const QString &filePath);
     void updateAccountList();
+    void updateExpenseIncomeList(int accountIndex);
 };
 #endif // MAINWINDOW_H

@@ -16,6 +16,7 @@ public:
     int findAccount(const QString &name) const;
     void addExpenseToAccount(int index, const Expense &expense);
     void addIncomeToAccount(int index, const Income &income);
+    const Account& getAccount(int index) const;
 
 private:
     QList<Account> accounts;

@@ -14,6 +14,16 @@ QList<Account> AccountContainer::getAccounts() const {
     return accounts;
 }
 
+// Metodo per ottenere un singolo account dato un indice
+const Account& AccountContainer::getAccount(int index) const {
+    if (index >= 0 && index < accounts.size()) {
+        return accounts.at(index);
+    } else {
+        throw std::out_of_range("Index is out of range");
+    }
+}
+
+
 // Metodo per rimuovere un account dal contenitore dato l'indice
 void AccountContainer::removeAccount(int index) {
     if (index >= 0 && index < accounts.size()) {

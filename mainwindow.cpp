@@ -7,6 +7,8 @@
 #include <QAction>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QVBoxLayout> // Include this for the vertical box layout
+#include <QListWidget> // Include this for the list widget
 #include "addaccountdialog.h"
 #include "addexpensedialog.h"
 #include "addincomedialog.h"
@@ -14,6 +16,7 @@
 // Costruttore
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent){
+
     createActions();
     createMenus();
     createToolBars();
@@ -95,7 +98,19 @@ void MainWindow::createStatusBar()
 void MainWindow::createCentralWidget()
 {
     accountTreeView = new QTreeView(this);
-    setCentralWidget(accountTreeView);
+    listWidget = new QListWidget(this);
+
+    // Create a layout and add both widgets to it
+    QVBoxLayout* layout = new QVBoxLayout();
+    layout->addWidget(accountTreeView);
+    layout->addWidget(listWidget);
+
+    // Create a central widget and set the layout
+    QWidget* centralWidget = new QWidget(this);
+    centralWidget->setLayout(layout);
+
+    // Set the central widget
+    setCentralWidget(centralWidget);
 }
 
 // Slot per aprire un file JSON
@@ -154,6 +169,7 @@ void MainWindow::on_actionAdd_Expense_triggered() {
 
         Expense newExpense(description, amount, date);
         accountContainer.addExpenseToAccount(selectedIndex, newExpense);
+        updateExpenseIncomeList(selectedIndex);
     }
 }
 
@@ -173,6 +189,7 @@ void MainWindow::on_actionAdd_Income_triggered() {
 
         Income newIncome(description, amount, date);
         accountContainer.addIncomeToAccount(selectedIndex, newIncome);
+        updateExpenseIncomeList(selectedIndex);
     }
 }
 
@@ -236,3 +253,22 @@ void MainWindow::updateAccountList() {
     }
 }
 
+// Metodo per aggiornare la lista delle spese e delle entrate
+void MainWindow::updateExpenseIncomeList(int accountIndex) {
+    listWidget->clear();
+
+    try{
+    const Account &account = accountContainer.getAccount(accountIndex);
+
+    for (const Expense &expense : account.getExpenses()) {
+        listWidget->addItem(expense.getDescription()); // assuming getDescription is a method in your Expense class
+    }
+
+    for (const Income &income : account.getIncomes()) {
+        listWidget->addItem(income.getDescription()); // assuming getDescription is a method in your Income class
+    }
+    } catch (const std::out_of_range& e) {
+    // gestisci l'errore qui, ad esempio visualizza un messaggio di errore
+    qDebug() << "Index out of range: " << e.what();
+    }
+}
