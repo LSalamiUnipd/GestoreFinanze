@@ -268,7 +268,6 @@ void MainWindow::updateExpenseIncomeList(int accountIndex) {
         listWidget->addItem(income.getDescription()); // assuming getDescription is a method in your Income class
     }
     } catch (const std::out_of_range& e) {
-    // gestisci l'errore qui, ad esempio visualizza un messaggio di errore
     qDebug() << "Index out of range: " << e.what();
     }
 }
