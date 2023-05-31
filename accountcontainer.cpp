@@ -23,6 +23,14 @@ const Account& AccountContainer::getAccount(int index) const {
     }
 }
 
+Account& AccountContainer::getAccount(int index) {
+    if (index >= 0 && index < accounts.size()) {
+        return accounts[index];
+    } else {
+        throw std::out_of_range("Index is out of range");
+    }
+}
+
 
 // Metodo per rimuovere un account dal contenitore dato l'indice
 void AccountContainer::removeAccount(int index) {

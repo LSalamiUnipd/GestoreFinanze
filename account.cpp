@@ -1,8 +1,8 @@
 #include "account.h"
 
 // Costruttore della classe Account
-Account::Account(const QString &name)
-    : name(name) {
+Account::Account(const QString &name, const QString &description)
+    : name(name), description(description) {
 }
 
 // Getter e setter per il nome dell'account
@@ -12,6 +12,15 @@ QString Account::getName() const {
 
 void Account::setName(const QString &newName) {
     name = newName;
+}
+
+// Getter e setter per la descrizione dell'account
+QString Account::getDescription() const {
+    return description;
+}
+
+void Account::setDescription(const QString &newDescription) {
+    description = newDescription;
 }
 
 // Metodo per aggiungere una spesa all'account

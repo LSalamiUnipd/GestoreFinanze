@@ -14,6 +14,7 @@ SOURCES += \
     addaccountdialog.cpp \
     addexpensedialog.cpp \
     addincomedialog.cpp \
+    editaccountdialog.cpp \
     expense.cpp \
     finance.cpp \
     income.cpp \
@@ -27,6 +28,7 @@ HEADERS += \
     addaccountdialog.h \
     addexpensedialog.h \
     addincomedialog.h \
+    editaccountdialog.h \
     expense.h \
     finance.h \
     income.h \

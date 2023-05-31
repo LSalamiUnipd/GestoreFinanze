@@ -8,25 +8,25 @@
 
 class Account {
 public:
-    // Costruttore
-    explicit Account(const QString &name);
+    Account(const QString &name, const QString &description = QString()); // Aggiunto parametro description con un valore predefinito
 
-    // Getter e setter per il nome dell'account
     QString getName() const;
-    void setName(const QString &name);
+    void setName(const QString &newName);
 
-    // Metodi per aggiungere, ottenere e rimuovere spese
+    QString getDescription() const; // Getter per la descrizione
+    void setDescription(const QString &newDescription); // Setter per la descrizione
+
     void addExpense(const Expense &expense);
     QVector<Expense> getExpenses() const;
     void removeExpense(int index);
 
-    // Metodi per aggiungere, ottenere e rimuovere entrate
     void addIncome(const Income &income);
     QVector<Income> getIncomes() const;
     void removeIncome(int index);
 
 private:
     QString name;
+    QString description; // Nuovo membro dati per la descrizione
     QVector<Expense> expenses;
     QVector<Income> incomes;
 };

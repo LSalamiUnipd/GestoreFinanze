@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "accountcontainer.h"
 #include "jsonhandler.h"
+#include <QLabel>
 #include <QListWidget>
 #include <QMenu>
 #include <QMenuBar>
@@ -26,6 +27,7 @@ public:
 
 private slots:
     // Slot per la gestione dei segnali dell'interfaccia utente
+    void on_accountListWidget_currentItemChanged(QListWidgetItem* current, QListWidgetItem* previous);
     void on_actionOpen_triggered();
     void on_actionSave_triggered();
     void on_actionSave_As_triggered();
@@ -34,6 +36,8 @@ private slots:
     void on_actionAdd_Expense_triggered();
     void on_actionAdd_Income_triggered();
     void on_actionRemove_Account_triggered();
+    void on_actionEdit_Account_triggered();
+    void on_actionRemove_Transaction_triggered();
 
 private:
     Ui::MainWindow *ui;
@@ -42,7 +46,11 @@ private:
     AccountContainer accountContainer;
     JsonHandler jsonHandler;
     QString currentFilePath;
-    QListWidget *listWidget;
+    QListWidget* accountListWidget;   // List widget for accounts
+    QListWidget* transactionListWidget;   // List widget for transactions (expenses and incomes)
+    QLabel *balanceLabel;
+    QLabel *accountListWidgetLabel;
+    QLabel *transactionListWidgetLabel;
     void createActions();
     void createMenus();
     void createToolBars();
@@ -60,16 +68,17 @@ private:
     QAction *addExpenseAction;
     QAction *addIncomeAction;
     QAction *removeAccountAction;
+    QAction *editAccountAction;
+    QAction *removeTransactionAction;
 
     QToolBar *fileToolBar;
     QToolBar *editToolBar;
-
-    QTreeView *accountTreeView;
 
     // Metodi di supporto
     void openFile(const QString &filePath);
     void saveFile(const QString &filePath);
     void updateAccountList();
     void updateExpenseIncomeList(int accountIndex);
+    void updateBalance();
 };
 #endif // MAINWINDOW_H

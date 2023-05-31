@@ -12,16 +12,21 @@
 #include "addaccountdialog.h"
 #include "addexpensedialog.h"
 #include "addincomedialog.h"
+#include "editaccountdialog.h"
+#include <QLabel>
 
 // Costruttore
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent){
+
+    resize(800, 600);
 
     createActions();
     createMenus();
     createToolBars();
     createStatusBar();
     createCentralWidget();
+    connect(accountListWidget, &QListWidget::currentItemChanged, this, &MainWindow::on_accountListWidget_currentItemChanged);
 }
 
 // Distruttore
@@ -30,33 +35,40 @@ MainWindow::~MainWindow() {
 
 void MainWindow::createActions()
 {
-    openAction = new QAction(tr("&Open"), this);
+    openAction = new QAction(tr("&Apri"), this);
     openAction->setShortcut(QKeySequence::Open);
     connect(openAction, &QAction::triggered, this, &MainWindow::on_actionOpen_triggered);
 
-    saveAction = new QAction(tr("&Save"), this);
+    saveAction = new QAction(tr("&Salva"), this);
     saveAction->setShortcut(QKeySequence::Save);
     connect(saveAction, &QAction::triggered, this, &MainWindow::on_actionSave_triggered);
 
-    saveAsAction = new QAction(tr("Save &As..."), this);
+    saveAsAction = new QAction(tr("&Salva con nome..."), this);
     saveAsAction->setShortcut(QKeySequence::SaveAs);
     connect(saveAsAction, &QAction::triggered, this, &MainWindow::on_actionSave_As_triggered);
 
-    exitAction = new QAction(tr("E&xit"), this);
+    exitAction = new QAction(tr("&Esci"), this);
     exitAction->setShortcut(QKeySequence::Quit);
     connect(exitAction, &QAction::triggered, this, &MainWindow::on_actionExit_triggered);
 
-    addAccountAction = new QAction(tr("&Add Account"), this);
+    addAccountAction = new QAction(tr("&Aggiungi Account"), this);
     connect(addAccountAction, &QAction::triggered, this, &MainWindow::on_actionAdd_Account_triggered);
 
-    addExpenseAction = new QAction(tr("Add &Expense"), this);
+    addExpenseAction = new QAction(tr("&Aggiungi Spesa"), this);
     connect(addExpenseAction, &QAction::triggered, this, &MainWindow::on_actionAdd_Expense_triggered);
 
-    addIncomeAction = new QAction(tr("Add &Income"), this);
+    addIncomeAction = new QAction(tr("&Aggiungi Entrata"), this);
     connect(addIncomeAction, &QAction::triggered, this, &MainWindow::on_actionAdd_Income_triggered);
 
-    removeAccountAction = new QAction(tr("&Remove Account"), this);
+    removeAccountAction = new QAction(tr("&Rimuovi Account"), this);
     connect(removeAccountAction, &QAction::triggered, this, &MainWindow::on_actionRemove_Account_triggered);
+
+    editAccountAction = new QAction(tr("&Modifica Account"), this);
+    connect(editAccountAction, &QAction::triggered, this, &MainWindow::on_actionEdit_Account_triggered);
+
+    removeTransactionAction = new QAction(tr("&Rimuovi Transazione"), this);
+    connect(removeTransactionAction, &QAction::triggered, this, &MainWindow::on_actionRemove_Transaction_triggered);
+
 }
 
 void MainWindow::createMenus()
@@ -68,12 +80,14 @@ void MainWindow::createMenus()
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
 
-    editMenu = menuBar()->addMenu(tr("&Edit"));
+    editMenu = menuBar()->addMenu(tr("&Modifica"));
     editMenu->addAction(addAccountAction);
     editMenu->addAction(addExpenseAction);
     editMenu->addAction(addIncomeAction);
     editMenu->addSeparator();
     editMenu->addAction(removeAccountAction);
+    editMenu->addAction(editAccountAction);
+    editMenu->addAction(removeTransactionAction);
 }
 
 void MainWindow::createToolBars()
@@ -83,27 +97,38 @@ void MainWindow::createToolBars()
     fileToolBar->addAction(saveAction);
     fileToolBar->addAction(saveAsAction);
 
-    editToolBar = addToolBar(tr("Edit"));
+    editToolBar = addToolBar(tr("Modifica"));
     editToolBar->addAction(addAccountAction);
-    editToolBar->addAction(addExpenseAction);
     editToolBar->addAction(addIncomeAction);
+    editToolBar->addAction(addExpenseAction);
     editToolBar->addAction(removeAccountAction);
+    editToolBar->addAction(editAccountAction);
+    editToolBar->addAction(removeTransactionAction);
 }
 
 void MainWindow::createStatusBar()
 {
-    statusBar()->showMessage(tr("Ready"));
+    statusBar()->showMessage(tr("Pronto"));
 }
 
 void MainWindow::createCentralWidget()
 {
-    accountTreeView = new QTreeView(this);
-    listWidget = new QListWidget(this);
+    accountListWidget = new QListWidget(this);
+    transactionListWidget = new QListWidget(this);
 
-    // Create a layout and add both widgets to it
+    // Create labels
+    accountListWidgetLabel = new QLabel(tr("Account"), this);
+    transactionListWidgetLabel = new QLabel(tr("Transazioni"), this);
+    balanceLabel = new QLabel(this);
+
+    // Create a layout and add widgets to it
     QVBoxLayout* layout = new QVBoxLayout();
-    layout->addWidget(accountTreeView);
-    layout->addWidget(listWidget);
+    layout->addWidget(accountListWidgetLabel);
+    layout->addWidget(accountListWidget);
+    layout->addWidget(transactionListWidgetLabel);
+    layout->addWidget(transactionListWidget);
+    layout->addWidget(balanceLabel);
+
 
     // Create a central widget and set the layout
     QWidget* centralWidget = new QWidget(this);
@@ -112,6 +137,17 @@ void MainWindow::createCentralWidget()
     // Set the central widget
     setCentralWidget(centralWidget);
 }
+
+void MainWindow::on_accountListWidget_currentItemChanged(QListWidgetItem* current, QListWidgetItem* previous)
+{
+    // Get the index of the selected account
+    int selectedIndex = accountListWidget->row(current);
+
+    // Update the transaction list for this account
+    updateExpenseIncomeList(selectedIndex);
+    updateBalance();
+}
+
 
 // Slot per aprire un file JSON
 void MainWindow::on_actionOpen_triggered() {
@@ -147,15 +183,17 @@ void MainWindow::on_actionExit_triggered() {
 void MainWindow::on_actionAdd_Account_triggered() {
     AddAccountDialog dialog(this);
     if (dialog.exec() == QDialog::Accepted) {
-        Account newAccount(dialog.getAccountName());
+        Account newAccount(dialog.getAccountName(), dialog.getAccountDescription());
         accountContainer.addAccount(newAccount);
         updateAccountList();
     }
+    updateBalance();
 }
+
 
 // Slot per aggiungere una nuova spesa
 void MainWindow::on_actionAdd_Expense_triggered() {
-    int selectedIndex = listWidget->currentRow();
+    int selectedIndex = accountListWidget->currentRow();
     if (selectedIndex < 0) {
         QMessageBox::warning(this, tr("Error"), tr("No account selected."));
         return;
@@ -171,11 +209,12 @@ void MainWindow::on_actionAdd_Expense_triggered() {
         accountContainer.addExpenseToAccount(selectedIndex, newExpense);
         updateExpenseIncomeList(selectedIndex);
     }
+    updateBalance();
 }
 
 // Slot per aggiungere una nuova entrata
 void MainWindow::on_actionAdd_Income_triggered() {
-    int selectedIndex = listWidget->currentRow();
+    int selectedIndex = accountListWidget->currentRow();
     if (selectedIndex < 0) {
         QMessageBox::warning(this, tr("Error"), tr("No account selected."));
         return;
@@ -191,11 +230,12 @@ void MainWindow::on_actionAdd_Income_triggered() {
         accountContainer.addIncomeToAccount(selectedIndex, newIncome);
         updateExpenseIncomeList(selectedIndex);
     }
+    updateBalance();
 }
 
 // Slot per rimuovere un account
 void MainWindow::on_actionRemove_Account_triggered() {
-    int selectedIndex = listWidget->currentRow();
+    int selectedIndex = accountListWidget->currentRow();
     if (selectedIndex < 0) {
         QMessageBox::warning(this, tr("Error"), tr("No account selected."));
         return;
@@ -209,8 +249,46 @@ void MainWindow::on_actionRemove_Account_triggered() {
         accountContainer.removeAccount(selectedIndex);
         updateAccountList();
     }
+    updateBalance();
 }
 
+void MainWindow::on_actionEdit_Account_triggered() {
+    int selectedIndex = accountListWidget->currentRow();
+    if (selectedIndex < 0) {
+        QMessageBox::warning(this, tr("Error"), tr("Nessun account selezionato."));
+        return;
+    }
+
+    // Ottenere le informazioni dell'account corrente.
+    Account& account = accountContainer.getAccount(selectedIndex);
+
+    // Creare un dialogo di modifica account con le informazioni correnti precompilate.
+    EditAccountDialog dialog(&account, this);
+
+    // Se l'utente ha accettato il dialogo, aggiorna le informazioni dell'account.
+    if (dialog.exec() == QDialog::Accepted) {
+        account.setName(dialog.getAccountName());
+        account.setDescription(dialog.getAccountDescription());
+        updateAccountList();
+    }
+}
+
+void MainWindow::on_actionRemove_Transaction_triggered() {
+    int selectedIndex = accountListWidget->currentRow();
+    int selectedTransactionIndex = transactionListWidget->currentRow();
+
+    if (selectedIndex < 0 || selectedTransactionIndex < 0) {
+        QMessageBox::warning(this, tr("Error"), tr("No account or transaction selected."));
+        return;
+    }
+
+    // Rimuovere la transazione selezionata.
+    accountContainer.getAccount(selectedIndex).removeTransaction(selectedTransactionIndex);
+
+    // Aggiornare la lista delle transazioni.
+    updateExpenseIncomeList(selectedIndex);
+    updateBalance();
+}
 // Metodo per aprire un file JSON
 void MainWindow::openFile(const QString &filePath) {
     QFile file(filePath);
@@ -246,28 +324,59 @@ void MainWindow::saveFile(const QString &filePath) {
 
 // Metodo per aggiornare la lista degli account
 void MainWindow::updateAccountList() {
-    listWidget->clear();
+    accountListWidget->clear();
 
     for (const Account &account : accountContainer.getAccounts()) {
-        listWidget->addItem(account.getName());
+        QString accountDetails = account.getName() + " - " + account.getDescription();
+        accountListWidget->addItem(accountDetails);
     }
 }
 
-// Metodo per aggiornare la lista delle spese e delle entrate
+
+
+// Method to update the expense and income list
 void MainWindow::updateExpenseIncomeList(int accountIndex) {
-    listWidget->clear();
+    transactionListWidget->clear();
 
-    try{
-    const Account &account = accountContainer.getAccount(accountIndex);
+    try {
+        const Account &account = accountContainer.getAccount(accountIndex);
 
-    for (const Expense &expense : account.getExpenses()) {
-        listWidget->addItem(expense.getDescription()); // assuming getDescription is a method in your Expense class
-    }
+        for (const Expense &expense : account.getExpenses()) {
+            QString expenseDetails = " -" +QString::number(expense.getAmount()) + " - " + expense.getDescription() + " - " + expense.getDate().toString();
+            transactionListWidget->addItem(expenseDetails);
+        }
 
-    for (const Income &income : account.getIncomes()) {
-        listWidget->addItem(income.getDescription()); // assuming getDescription is a method in your Income class
-    }
+        for (const Income &income : account.getIncomes()) {
+            QString incomeDetails = " +" + QString::number(income.getAmount()) + " - " + income.getDescription() + " - " + income.getDate().toString();
+            transactionListWidget->addItem(incomeDetails);
+        }
     } catch (const std::out_of_range& e) {
-    qDebug() << "Index out of range: " << e.what();
+        qDebug() << "Index out of range: " << e.what();
     }
 }
+
+void MainWindow::updateBalance() {
+    int selectedIndex = accountListWidget->currentRow();
+    if (selectedIndex < 0) {
+        balanceLabel->clear();
+        return;
+    }
+
+    try {
+        const Account &account = accountContainer.getAccount(selectedIndex);
+        double balance = 0.0;
+
+        for (const Expense &expense : account.getExpenses()) {
+            balance -= expense.getAmount();
+        }
+
+        for (const Income &income : account.getIncomes()) {
+            balance += income.getAmount();
+        }
+
+        balanceLabel->setText(tr("Saldo: ") + QString::number(balance));
+    } catch (const std::out_of_range& e) {
+        qDebug() << "Index out of range: " << e.what();
+    }
+}
+
