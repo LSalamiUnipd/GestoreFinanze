@@ -19,6 +19,7 @@ SOURCES += \
     finance.cpp \
     income.cpp \
     jsonhandler.cpp \
+    loan.cpp \
     main.cpp \
     mainwindow.cpp
 
@@ -33,6 +34,7 @@ HEADERS += \
     finance.h \
     income.h \
     jsonhandler.h \
+    loan.h \
     mainwindow.h
 
 FORMS += \

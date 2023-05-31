@@ -56,3 +56,22 @@ void Account::removeIncome(int index) {
         incomes.remove(index);
     }
 }
+
+// Aggiunge un prestito all'account
+void Account::addLoan(const Loan &loan) {
+    loans.append(loan);
+}
+
+// Restituisce tutti i prestiti per l'account
+QVector<Loan> Account::getLoans() const {
+    return loans;
+}
+
+// Rimuove un prestito dall'account
+void Account::removeLoan(int index) {
+    if (index >= 0 && index < loans.size()) {
+        loans.remove(index);
+    } else {
+        throw std::out_of_range("Index is out of range");
+    }
+}

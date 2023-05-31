@@ -282,13 +282,22 @@ void MainWindow::on_actionRemove_Transaction_triggered() {
         return;
     }
 
-    // Rimuovere la transazione selezionata.
-    accountContainer.getAccount(selectedIndex).removeTransaction(selectedTransactionIndex);
+    // Determine if the selected transaction is an expense or income.
+    QString selectedTransactionText = transactionListWidget->item(selectedTransactionIndex)->text();
+    bool isExpense = selectedTransactionText.startsWith(" -"); // Modify as appropriate based on your formatting
 
-    // Aggiornare la lista delle transazioni.
+    // Remove the selected transaction.
+    if (isExpense) {
+        accountContainer.getAccount(selectedIndex).removeExpense(selectedTransactionIndex);
+    } else {
+        accountContainer.getAccount(selectedIndex).removeIncome(selectedTransactionIndex);
+    }
+
+    // Update the transaction list.
     updateExpenseIncomeList(selectedIndex);
     updateBalance();
 }
+
 // Metodo per aprire un file JSON
 void MainWindow::openFile(const QString &filePath) {
     QFile file(filePath);

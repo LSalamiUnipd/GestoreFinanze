@@ -57,3 +57,7 @@ void AccountContainer::addIncomeToAccount(int index, const Income &income) {
     accounts[index].addIncome(income);
 }
 
+// Aggiunge un prestito a un account specificato dall'indice
+void AccountContainer::addLoanToAccount(int index, const Loan &loan) {
+    accounts[index].addLoan(loan);
+}

@@ -5,6 +5,7 @@
 #include <QVector>
 #include "expense.h"
 #include "income.h"
+#include "loan.h"
 
 class Account {
 public:
@@ -24,11 +25,16 @@ public:
     QVector<Income> getIncomes() const;
     void removeIncome(int index);
 
+    void addLoan(const Loan &loan);
+    QVector<Loan> getLoans() const;
+    void removeLoan(int index);
+
 private:
     QString name;
     QString description; // Nuovo membro dati per la descrizione
     QVector<Expense> expenses;
     QVector<Income> incomes;
+    QVector<Loan> loans;
 };
 
 #endif // ACCOUNT_H
