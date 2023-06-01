@@ -1,3 +1,6 @@
+#ifndef LOAN_H
+#define LOAN_H
+
 #include "finance.h"
 
 class Loan : public Finance {
@@ -26,3 +29,5 @@ private:
     double interestRate; // tasso di interesse del prestito
     bool isPaid; // stato del pagamento del prestito
 };
+
+#endif // LOAN_H

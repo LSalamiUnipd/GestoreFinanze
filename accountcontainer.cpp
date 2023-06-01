@@ -1,63 +1,99 @@
 #include "accountcontainer.h"
+#include "expense.h"
+#include "income.h"
+#include "loan.h"
 
-// Costruttore della classe AccountContainer
-AccountContainer::AccountContainer() {
-}
+AccountContainer::AccountContainer() : head(nullptr) {}
 
-// Metodo per aggiungere un account al contenitore
 void AccountContainer::addAccount(const Account &account) {
-    accounts.append(account);
+    AccountNode* newNode = new AccountNode;
+    newNode->account = account;
+    newNode->next = head;
+    head = newNode;
 }
 
-// Metodo per ottenere tutti gli account nel contenitore
-QList<Account> AccountContainer::getAccounts() const {
-    return accounts;
-}
-
-// Metodo per ottenere un singolo account dato un indice
-const Account& AccountContainer::getAccount(int index) const {
-    if (index >= 0 && index < accounts.size()) {
-        return accounts.at(index);
-    } else {
-        throw std::out_of_range("Index is out of range");
-    }
-}
-
-Account& AccountContainer::getAccount(int index) {
-    if (index >= 0 && index < accounts.size()) {
-        return accounts[index];
-    } else {
-        throw std::out_of_range("Index is out of range");
-    }
-}
-
-
-// Metodo per rimuovere un account dal contenitore dato l'indice
-void AccountContainer::removeAccount(int index) {
-    if (index >= 0 && index < accounts.size()) {
-        accounts.removeAt(index);
-    }
-}
-
-// Metodo per cercare un account nel contenitore in base al nome
-int AccountContainer::findAccount(const QString &name) const {
-    for (int i = 0; i < accounts.size(); ++i) {
-        if (accounts[i].getName() == name) {
-            return i;
+Account AccountContainer::getAccount(int index) const {
+    AccountNode* current = head;
+    int count = 0;
+    while (current != nullptr) {
+        if (count == index) {
+            return current->account;
         }
+        current = current->next;
+        count++;
     }
-    return -1; // Se non trovato, ritorna -1
+    throw std::out_of_range("Index out of range");
 }
 
-void AccountContainer::addExpenseToAccount(int index, const Expense &expense) {
-    accounts[index].addExpense(expense);
+void AccountContainer::removeAccount(int index) {
+    if (head == nullptr) {
+        throw std::out_of_range("Cannot remove from empty list");
+    }
+
+    if (index == 0) {
+        AccountNode* toDelete = head;
+        head = head->next;
+        delete toDelete;
+        return;
+    }
+
+    AccountNode* current = head;
+    int count = 0;
+    while (current->next != nullptr && count < index - 1) {
+        current = current->next;
+        count++;
+    }
+
+    if (current->next == nullptr || count != index - 1) {
+        throw std::out_of_range("Index out of range");
+    }
+
+    AccountNode* toDelete = current->next;
+    current->next = toDelete->next;
+    delete toDelete;
 }
 
-void AccountContainer::addIncomeToAccount(int index, const Income &income) {
-    accounts[index].addIncome(income);
+int AccountContainer::findAccount(const std::string &name) const {
+    AccountNode* current = head;
+    int index = 0;
+    while (current != nullptr) {
+        if (current->account.getName() == name) {
+            return index;
+        }
+        current = current->next;
+        index++;
+    }
+    return -1;
 }
 
-// Aggiunge un prestito a un account specificato dall'indice
-void AccountContainer::addLoanToAccount(int index, const Loan &loan) {
-    accounts[index].addLoan(loan);
+AccountContainer::~AccountContainer() {
+    while (head != nullptr) {
+        AccountNode* next = head->next;
+        delete head;
+        head = next;
+    }
+}
+
+
+void AccountContainer::addTransactionToAccount(int index, const Finance &transaction) {
+    AccountNode* current = head;
+    int count = 0;
+    while (current != nullptr) {
+        if (count == index) {
+            AccountNode::FinanceNode* newTransaction = new AccountNode::FinanceNode;
+            if (dynamic_cast<const Expense*>(&transaction)) {
+                newTransaction->transaction = new Expense(static_cast<const Expense&>(transaction));
+            } else if (dynamic_cast<const Income*>(&transaction)) {
+                newTransaction->transaction = new Income(static_cast<const Income&>(transaction));
+            } else if (dynamic_cast<const Loan*>(&transaction)) {
+                newTransaction->transaction = new Loan(static_cast<const Loan&>(transaction));
+            }
+            newTransaction->next = current->transactionsHead;
+            current->transactionsHead = newTransaction;
+            return;
+        }
+        current = current->next;
+        count++;
+    }
+    throw std::out_of_range("Index out of range");
 }

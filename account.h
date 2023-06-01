@@ -1,40 +1,27 @@
 #ifndef ACCOUNT_H
 #define ACCOUNT_H
 
-#include <QString>
-#include <QVector>
-#include "expense.h"
-#include "income.h"
-#include "loan.h"
+#include <string>
 
 class Account {
 public:
-    Account(const QString &name, const QString &description = QString()); // Aggiunto parametro description con un valore predefinito
+    // Costruttore di default
+    Account();
 
-    QString getName() const;
-    void setName(const QString &newName);
+    // Costruttore con parametri
+    Account(const std::string &name, const std::string &description);
 
-    QString getDescription() const; // Getter per la descrizione
-    void setDescription(const QString &newDescription); // Setter per la descrizione
+    // Getter e setter per il nome dell'account
+    std::string getName() const;
+    void setName(const std::string &newName);
 
-    void addExpense(const Expense &expense);
-    QVector<Expense> getExpenses() const;
-    void removeExpense(int index);
-
-    void addIncome(const Income &income);
-    QVector<Income> getIncomes() const;
-    void removeIncome(int index);
-
-    void addLoan(const Loan &loan);
-    QVector<Loan> getLoans() const;
-    void removeLoan(int index);
+    // Getter e setter per la descrizione dell'account
+    std::string getDescription() const;
+    void setDescription(const std::string &newDescription);
 
 private:
-    QString name;
-    QString description; // Nuovo membro dati per la descrizione
-    QVector<Expense> expenses;
-    QVector<Income> incomes;
-    QVector<Loan> loans;
+    std::string name;
+    std::string description;
 };
 
 #endif // ACCOUNT_H

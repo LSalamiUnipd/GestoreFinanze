@@ -14,8 +14,8 @@ EditAccountDialog::EditAccountDialog(Account *accountToEdit, QWidget *parent)
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
 
     // Precompila i campi con i dati dell'account da modificare
-    nameEdit->setText(account->getName());
-    descriptionEdit->setPlainText(account->getDescription());
+    nameEdit->setText(QString::fromStdString(account->getName()));
+    descriptionEdit->setPlainText(QString::fromStdString(account->getDescription()));
 
     // Layout e aggiunta dei widget
     QFormLayout *formLayout = new QFormLayout;
@@ -43,8 +43,8 @@ QString EditAccountDialog::getAccountDescription() const {
 // Metodo che viene chiamato quando il pulsante OK viene premuto
 void EditAccountDialog::accept() {
     // Aggiorna i dati dell'account con i nuovi valori inseriti
-    account->setName(nameEdit->text());
-    account->setDescription(descriptionEdit->toPlainText());
+    account->setName(nameEdit->text().toStdString());
+    account->setDescription(descriptionEdit->toPlainText().toStdString());
 
     // Chiama il metodo accept della classe base QDialog per chiudere il dialogo
     QDialog::accept();
