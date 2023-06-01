@@ -1,7 +1,7 @@
 #ifndef ACCOUNT_H
 #define ACCOUNT_H
 
-#include <string>
+#include <QString>
 
 class Account {
 public:
@@ -9,19 +9,19 @@ public:
     Account();
 
     // Costruttore con parametri
-    Account(const std::string &name, const std::string &description);
+    Account(const QString &name, const QString &description);
 
     // Getter e setter per il nome dell'account
-    std::string getName() const;
-    void setName(const std::string &newName);
+    QString getName() const;
+    void setName(const QString &newName);
 
     // Getter e setter per la descrizione dell'account
-    std::string getDescription() const;
-    void setDescription(const std::string &newDescription);
+    QString getDescription() const;
+    void setDescription(const QString &newDescription);
 
 private:
-    std::string name;
-    std::string description;
+    QString name;
+    QString description;
 };
 
 #endif // ACCOUNT_H

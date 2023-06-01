@@ -1,7 +1,7 @@
 #ifndef ACCOUNTCONTAINER_H
 #define ACCOUNTCONTAINER_H
 
-#include <string>
+#include <QString>
 #include <stdexcept>
 #include "account.h"
 #include "finance.h"
@@ -15,8 +15,9 @@ public:
     void addAccount(const Account &account);
     Account getAccount(int index) const;
     void removeAccount(int index);
-    int findAccount(const std::string &name) const;
+    int findAccount(const QString &name) const;
     void addTransactionToAccount(int index, const Finance &transaction);
+    QList<Account> getAccounts() const;
     ~AccountContainer();
 
 private:

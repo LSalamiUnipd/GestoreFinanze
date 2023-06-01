@@ -2,6 +2,7 @@
 #include "expense.h"
 #include "income.h"
 #include "loan.h"
+#include <QList>
 
 AccountContainer::AccountContainer() : head(nullptr) {}
 
@@ -53,7 +54,7 @@ void AccountContainer::removeAccount(int index) {
     delete toDelete;
 }
 
-int AccountContainer::findAccount(const std::string &name) const {
+int AccountContainer::findAccount(const QString &name) const {
     AccountNode* current = head;
     int index = 0;
     while (current != nullptr) {
@@ -96,4 +97,14 @@ void AccountContainer::addTransactionToAccount(int index, const Finance &transac
         count++;
     }
     throw std::out_of_range("Index out of range");
+}
+
+QList<Account> AccountContainer::getAccounts() const {
+    QList<Account> accounts;
+    AccountNode* current = head;
+    while (current != nullptr) {
+        accounts.append(current->account);
+        current = current->next;
+    }
+    return accounts;
 }
