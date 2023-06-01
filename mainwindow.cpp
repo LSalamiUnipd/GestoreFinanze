@@ -12,7 +12,11 @@
 #include "addaccountdialog.h"
 #include "addexpensedialog.h"
 #include "addincomedialog.h"
+#include "addloandialog.h"
 #include "editaccountdialog.h"
+#include "expense.h"
+#include "income.h"
+#include "loan.h"
 #include <QLabel>
 
 // Costruttore
@@ -60,6 +64,9 @@ void MainWindow::createActions()
     addIncomeAction = new QAction(tr("&Aggiungi Entrata"), this);
     connect(addIncomeAction, &QAction::triggered, this, &MainWindow::on_actionAdd_Income_triggered);
 
+    addLoanAction = new QAction(tr("&Aggiungi Prestito"), this);
+    connect(addLoanAction, &QAction::triggered, this, &MainWindow::on_actionAdd_Loan_triggered);
+
     removeAccountAction = new QAction(tr("&Rimuovi Account"), this);
     connect(removeAccountAction, &QAction::triggered, this, &MainWindow::on_actionRemove_Account_triggered);
 
@@ -82,8 +89,9 @@ void MainWindow::createMenus()
 
     editMenu = menuBar()->addMenu(tr("&Modifica"));
     editMenu->addAction(addAccountAction);
-    editMenu->addAction(addExpenseAction);
     editMenu->addAction(addIncomeAction);
+    editMenu->addAction(addExpenseAction);
+    editMenu->addAction(addLoanAction);
     editMenu->addSeparator();
     editMenu->addAction(removeAccountAction);
     editMenu->addAction(editAccountAction);
@@ -101,6 +109,7 @@ void MainWindow::createToolBars()
     editToolBar->addAction(addAccountAction);
     editToolBar->addAction(addIncomeAction);
     editToolBar->addAction(addExpenseAction);
+    editToolBar->addAction(addLoanAction);
     editToolBar->addAction(removeAccountAction);
     editToolBar->addAction(editAccountAction);
     editToolBar->addAction(removeTransactionAction);
@@ -206,11 +215,18 @@ void MainWindow::on_actionAdd_Expense_triggered() {
         QDate date = dialog.getExpenseDate();
 
         Expense newExpense(description, amount, date);
-        accountContainer.addExpenseToAccount(selectedIndex, newExpense);
-        updateExpenseIncomeList(selectedIndex);
+
+        try {
+            accountContainer.addTransactionToAccount(selectedIndex, newExpense);
+            updateExpenseIncomeList(selectedIndex);
+        } catch (const std::out_of_range& e) {
+            qDebug() << "Error adding expense: " << e.what();
+            QMessageBox::warning(this, tr("Error"), tr("Failed to add expense."));
+        }
     }
     updateBalance();
 }
+
 
 // Slot per aggiungere una nuova entrata
 void MainWindow::on_actionAdd_Income_triggered() {
@@ -227,11 +243,47 @@ void MainWindow::on_actionAdd_Income_triggered() {
         QDate date = dialog.getIncomeDate();
 
         Income newIncome(description, amount, date);
-        accountContainer.addIncomeToAccount(selectedIndex, newIncome);
-        updateExpenseIncomeList(selectedIndex);
+
+        try {
+            accountContainer.addTransactionToAccount(selectedIndex, newIncome);
+            updateExpenseIncomeList(selectedIndex);
+        } catch (const std::out_of_range& e) {
+            qDebug() << "Error adding income: " << e.what();
+            QMessageBox::warning(this, tr("Error"), tr("Failed to add income."));
+        }
     }
     updateBalance();
 }
+
+void MainWindow::on_actionAdd_Loan_triggered() {
+    int selectedIndex = accountListWidget->currentRow();
+    if (selectedIndex < 0) {
+        QMessageBox::warning(this, tr("Error"), tr("No account selected."));
+        return;
+    }
+
+    AddLoanDialog dialog(this);
+    if (dialog.exec() == QDialog::Accepted) {
+        QString description = dialog.getLoanDescription();
+        double amount = dialog.getLoanAmount();
+        QDate date = dialog.getLoanDate();
+        int duration = dialog.getLoanDuration();
+        double interestRate = dialog.getLoanInterestRate();
+        bool isPaid = dialog.isLoanPaid();
+
+        Loan newLoan(description, amount, date, duration, interestRate, isPaid);
+
+        try {
+            accountContainer.addTransactionToAccount(selectedIndex, newLoan);
+            updateExpenseIncomeList(selectedIndex);
+        } catch (const std::out_of_range& e) {
+            qDebug() << "Error adding loan: " << e.what();
+            QMessageBox::warning(this, tr("Error"), tr("Failed to add loan."));
+        }
+    }
+    updateBalance();
+}
+
 
 // Slot per rimuovere un account
 void MainWindow::on_actionRemove_Account_triggered() {
@@ -259,19 +311,20 @@ void MainWindow::on_actionEdit_Account_triggered() {
         return;
     }
 
-    // Ottenere le informazioni dell'account corrente.
-    Account& account = accountContainer.getAccount(selectedIndex);
+    // Ottenere l'account corrente
+    Account currentAccount = accountContainer.getAccount(selectedIndex);
 
     // Creare un dialogo di modifica account con le informazioni correnti precompilate.
-    EditAccountDialog dialog(&account, this);
+    EditAccountDialog dialog(&currentAccount, this);
 
-    // Se l'utente ha accettato il dialogo, aggiorna le informazioni dell'account.
+    // Se l'utente ha accettato il dialogo, aggiorna l'account nell'AccountContainer
     if (dialog.exec() == QDialog::Accepted) {
-        account.setName(dialog.getAccountName());
-        account.setDescription(dialog.getAccountDescription());
+        accountContainer.setAccount(selectedIndex, currentAccount);
         updateAccountList();
     }
 }
+
+
 
 void MainWindow::on_actionRemove_Transaction_triggered() {
     int selectedIndex = accountListWidget->currentRow();

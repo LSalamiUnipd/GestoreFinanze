@@ -2,6 +2,9 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include "jsonhandler.h"
+#include "expense.h"
+#include "income.h"
+#include "loan.h"
 
 JsonHandler::JsonHandler() {
 }
@@ -42,35 +45,37 @@ bool JsonHandler::writeJson(QFile &file, const AccountContainer &accountContaine
 }
 
 
-
-// Metodo per convertire un AccountContainer in un oggetto QJsonArray
+// Method to convert an AccountContainer to a QJsonArray
 QJsonArray JsonHandler::accountContainerToJsonArray(const AccountContainer &accountContainer) const {
     QJsonArray jsonArray;
 
-    for (const Account &account : accountContainer.getAccounts()) {
+    for (int i = 0; i < accountContainer.getAccounts().size(); i++) {
+        const Account &account = accountContainer.getAccount(i);
         QJsonObject accountObject;
+
         accountObject["name"] = account.getName();
+        accountObject["description"] = account.getDescription();
 
-        QJsonArray expensesArray;
-        for (const Expense &expense : account.getExpenses()) {
-            QJsonObject expenseObject;
-            expenseObject["description"] = expense.getDescription();
-            expenseObject["amount"] = expense.getAmount();
-            expenseObject["date"] = expense.getDate().toString(Qt::ISODate);
-            expensesArray.append(expenseObject);
+        QJsonArray transactionsArray;
+        for (const Finance* transaction : accountContainer.getTransactions(i)) {
+            QJsonObject transactionObject;
+
+            transactionObject["description"] = transaction->getDescription();
+            transactionObject["amount"] = transaction->getAmount();
+            transactionObject["date"] = transaction->getDate().toString(Qt::ISODate);
+            transactionObject["type"] = transaction->getType();
+
+            if (transaction->getType() == "Loan") {
+                const Loan* loan = static_cast<const Loan*>(transaction);
+                transactionObject["duration"] = loan->getDuration();
+                transactionObject["interestRate"] = loan->getInterestRate();
+                transactionObject["isPaid"] = loan->isLoanPaid();
+            }
+
+            transactionsArray.append(transactionObject);
         }
-        accountObject["expenses"] = expensesArray;
 
-        QJsonArray incomesArray;
-        for (const Income &income : account.getIncomes()) {
-            QJsonObject incomeObject;
-            incomeObject["description"] = income.getDescription();
-            incomeObject["amount"] = income.getAmount();
-            incomeObject["date"] = income.getDate().toString(Qt::ISODate);
-            incomesArray.append(incomeObject);
-        }
-        accountObject["incomes"] = incomesArray;
-
+        accountObject["transactions"] = transactionsArray;
         jsonArray.append(accountObject);
     }
 
@@ -78,38 +83,43 @@ QJsonArray JsonHandler::accountContainerToJsonArray(const AccountContainer &acco
 }
 
 
-// Metodo per convertire un oggetto QJsonArray in un AccountContainer
+
+// Method to convert a QJsonArray to an AccountContainer
 void JsonHandler::jsonArrayToAccountContainer(const QJsonArray &jsonArray, AccountContainer &accountContainer) {
     for (const QJsonValue &value : jsonArray) {
         QJsonObject accountObject = value.toObject();
 
         QString accountName = accountObject["name"].toString();
-        Account account(accountName);
+        QString accountDescription = accountObject["description"].toString();
+        Account account(accountName, accountDescription);
 
-        QJsonArray expensesArray = accountObject["expenses"].toArray();
-        for (const QJsonValue &expenseValue : expensesArray) {
-            QJsonObject expenseObject = expenseValue.toObject();
+        QJsonArray transactionsArray = accountObject["transactions"].toArray();
+        for (const QJsonValue &transactionValue : transactionsArray) {
+            QJsonObject transactionObject = transactionValue.toObject();
 
-            QString description = expenseObject["description"].toString();
-            double amount = expenseObject["amount"].toDouble();
-            QDate date = QDate::fromString(expenseObject["date"].toString(), Qt::ISODate);
+            QString description = transactionObject["description"].toString();
+            double amount = transactionObject["amount"].toDouble();
+            QDate date = QDate::fromString(transactionObject["date"].toString(), Qt::ISODate);
+            QString type = transactionObject["type"].toString();
 
-            Expense expense(description, amount, date);
-            account.addExpense(expense);
+            if (type == "Expense") {
+                Expense* expense = new Expense(description, amount, date);
+                accountContainer.addTransactionToAccount(accountContainer.findAccount(accountName), *expense);
+            } else if (type == "Income") {
+                Income* income = new Income(description, amount, date);
+                accountContainer.addTransactionToAccount(accountContainer.findAccount(accountName), *income);
+            } else if (type == "Loan") {
+                int duration = transactionObject["duration"].toInt();
+                double interestRate = transactionObject["interestRate"].toDouble();
+                bool isPaid = transactionObject["isPaid"].toBool();
+
+                Loan* loan = new Loan(description, amount, date, duration, interestRate, isPaid);
+                accountContainer.addTransactionToAccount(accountContainer.findAccount(accountName), loan);
+            }
         }
 
-        QJsonArray incomesArray = accountObject["incomes"].toArray();
-        for (const QJsonValue &incomeValue : incomesArray) {
-            QJsonObject incomeObject = incomeValue.toObject();
-
-            QString description = incomeObject["description"].toString();
-            double amount = incomeObject["amount"].toDouble();
-            QDate date = QDate::fromString(incomeObject["date"].toString(), Qt::ISODate);
-
-            Income income(description, amount, date);
-            account.addIncome(income);
+        if (!accountContainer.getAccount(accountContainer.findAccount(accountName)).getName().isEmpty()) {
+            accountContainer.addAccount(account);
         }
-
-        accountContainer.addAccount(account);
     }
 }

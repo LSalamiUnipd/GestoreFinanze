@@ -9,7 +9,7 @@ public:
     Account();
 
     // Costruttore con parametri
-    Account(const QString &name, const QString &description);
+    Account(const QString &name, const QString &description = "");
 
     // Getter e setter per il nome dell'account
     QString getName() const;

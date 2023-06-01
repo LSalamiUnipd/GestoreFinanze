@@ -35,6 +35,7 @@ private slots:
     void on_actionAdd_Account_triggered();
     void on_actionAdd_Expense_triggered();
     void on_actionAdd_Income_triggered();
+    void on_actionAdd_Loan_triggered();
     void on_actionRemove_Account_triggered();
     void on_actionEdit_Account_triggered();
     void on_actionRemove_Transaction_triggered();
@@ -67,6 +68,7 @@ private:
     QAction *addAccountAction;
     QAction *addExpenseAction;
     QAction *addIncomeAction;
+    QAction *addLoanAction;
     QAction *removeAccountAction;
     QAction *editAccountAction;
     QAction *removeTransactionAction;

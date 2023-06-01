@@ -6,7 +6,7 @@
 class Loan : public Finance {
 public:
     // Costruttore della classe Loan
-    Loan(const QString &description, double amount, const QDate &date, int duration, double interestRate, bool isPaid = false);
+    Loan(const QString &description, double amount, const QDate &date, int duration = 0, double interestRate = 0.0, bool isPaid = false);
 
     // Distruttore della classe Loan
     ~Loan();

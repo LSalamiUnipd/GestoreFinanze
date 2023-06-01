@@ -14,10 +14,16 @@ public:
     // Metodi per aggiungere, ottenere, rimuovere e cercare account
     void addAccount(const Account &account);
     Account getAccount(int index) const;
+    void setAccount(int index, const Account& account);
     void removeAccount(int index);
     int findAccount(const QString &name) const;
+    // Methods for adding, removing and retrieving transactions
     void addTransactionToAccount(int index, const Finance &transaction);
+    void removeTransactionFromAccount(int accountIndex, int transactionIndex);
+    QList<Finance*> getTransactions(int accountIndex) const;
+
     QList<Account> getAccounts() const;
+
     ~AccountContainer();
 
 private:
@@ -27,12 +33,10 @@ private:
             Finance* transaction;
             FinanceNode* next;
 
-            // Aggiungi questo costruttore
             FinanceNode() : transaction(nullptr), next(nullptr) {}
         } *transactionsHead;
         AccountNode* next;
 
-        // Aggiungi questo costruttore
         AccountNode() : transactionsHead(nullptr), next(nullptr) {}
     };
     AccountNode* head;

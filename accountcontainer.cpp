@@ -26,6 +26,20 @@ Account AccountContainer::getAccount(int index) const {
     throw std::out_of_range("Index out of range");
 }
 
+void AccountContainer::setAccount(int index, const Account& account) {
+    AccountNode* current = head;
+    int count = 0;
+    while (current != nullptr) {
+        if (count == index) {
+            current->account = account;
+            return;
+        }
+        current = current->next;
+        count++;
+    }
+    throw std::out_of_range("Index out of range");
+}
+
 void AccountContainer::removeAccount(int index) {
     if (head == nullptr) {
         throw std::out_of_range("Cannot remove from empty list");
@@ -69,11 +83,21 @@ int AccountContainer::findAccount(const QString &name) const {
 
 AccountContainer::~AccountContainer() {
     while (head != nullptr) {
-        AccountNode* next = head->next;
+        AccountNode* nextAccount = head->next;
+
+        AccountNode::FinanceNode* currentTransaction = head->transactionsHead;
+        while (currentTransaction != nullptr) {
+            AccountNode::FinanceNode* nextTransaction = currentTransaction->next;
+            delete currentTransaction->transaction;
+            delete currentTransaction;
+            currentTransaction = nextTransaction;
+        }
+
         delete head;
-        head = next;
+        head = nextAccount;
     }
 }
+
 
 
 void AccountContainer::addTransactionToAccount(int index, const Finance &transaction) {
@@ -97,6 +121,56 @@ void AccountContainer::addTransactionToAccount(int index, const Finance &transac
         count++;
     }
     throw std::out_of_range("Index out of range");
+}
+
+void AccountContainer::removeTransactionFromAccount(int accountIndex, int transactionIndex) {
+    AccountNode* current = head;
+    int count = 0;
+    while (current != nullptr) {
+        if (count == accountIndex) {
+            AccountNode::FinanceNode* transactionCurrent = current->transactionsHead;
+            AccountNode::FinanceNode* transactionPrev = nullptr;
+            int transactionCount = 0;
+            while (transactionCurrent != nullptr) {
+                if (transactionCount == transactionIndex) {
+                    if (transactionPrev == nullptr) {
+                        current->transactionsHead = transactionCurrent->next;
+                    } else {
+                        transactionPrev->next = transactionCurrent->next;
+                    }
+                    delete transactionCurrent->transaction;
+                    delete transactionCurrent;
+                    return;
+                }
+                transactionPrev = transactionCurrent;
+                transactionCurrent = transactionCurrent->next;
+                transactionCount++;
+            }
+            throw std::out_of_range("Transaction index out of range");
+        }
+        current = current->next;
+        count++;
+    }
+    throw std::out_of_range("Account index out of range");
+}
+
+QList<Finance*> AccountContainer::getTransactions(int accountIndex) const {
+    AccountNode* current = head;
+    int count = 0;
+    while (current != nullptr) {
+        if (count == accountIndex) {
+            QList<Finance*> transactions;
+            AccountNode::FinanceNode* transactionCurrent = current->transactionsHead;
+            while (transactionCurrent != nullptr) {
+                transactions.append(transactionCurrent->transaction);
+                transactionCurrent = transactionCurrent->next;
+            }
+            return transactions;
+        }
+        current = current->next;
+        count++;
+    }
+    throw std::out_of_range("Account index out of range");
 }
 
 QList<Account> AccountContainer::getAccounts() const {
