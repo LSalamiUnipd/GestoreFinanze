@@ -114,7 +114,7 @@ void JsonHandler::jsonArrayToAccountContainer(const QJsonArray &jsonArray, Accou
                 bool isPaid = transactionObject["isPaid"].toBool();
 
                 Loan* loan = new Loan(description, amount, date, duration, interestRate, isPaid);
-                accountContainer.addTransactionToAccount(accountContainer.findAccount(accountName), loan);
+                accountContainer.addTransactionToAccount(accountContainer.findAccount(accountName), *loan);
             }
         }
 

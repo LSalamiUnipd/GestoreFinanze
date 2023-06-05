@@ -153,7 +153,7 @@ void MainWindow::on_accountListWidget_currentItemChanged(QListWidgetItem* curren
     int selectedIndex = accountListWidget->row(current);
 
     // Update the transaction list for this account
-    updateExpenseIncomeList(selectedIndex);
+    updateTransactionList(selectedIndex);
     updateBalance();
 }
 
@@ -218,7 +218,7 @@ void MainWindow::on_actionAdd_Expense_triggered() {
 
         try {
             accountContainer.addTransactionToAccount(selectedIndex, newExpense);
-            updateExpenseIncomeList(selectedIndex);
+            updateTransactionList(selectedIndex);
         } catch (const std::out_of_range& e) {
             qDebug() << "Error adding expense: " << e.what();
             QMessageBox::warning(this, tr("Error"), tr("Failed to add expense."));
@@ -246,7 +246,7 @@ void MainWindow::on_actionAdd_Income_triggered() {
 
         try {
             accountContainer.addTransactionToAccount(selectedIndex, newIncome);
-            updateExpenseIncomeList(selectedIndex);
+            updateTransactionList(selectedIndex);
         } catch (const std::out_of_range& e) {
             qDebug() << "Error adding income: " << e.what();
             QMessageBox::warning(this, tr("Error"), tr("Failed to add income."));
@@ -275,7 +275,7 @@ void MainWindow::on_actionAdd_Loan_triggered() {
 
         try {
             accountContainer.addTransactionToAccount(selectedIndex, newLoan);
-            updateExpenseIncomeList(selectedIndex);
+            updateTransactionList(selectedIndex);
         } catch (const std::out_of_range& e) {
             qDebug() << "Error adding loan: " << e.what();
             QMessageBox::warning(this, tr("Error"), tr("Failed to add loan."));
@@ -335,21 +335,14 @@ void MainWindow::on_actionRemove_Transaction_triggered() {
         return;
     }
 
-    // Determine if the selected transaction is an expense or income.
-    QString selectedTransactionText = transactionListWidget->item(selectedTransactionIndex)->text();
-    bool isExpense = selectedTransactionText.startsWith(" -"); // Modify as appropriate based on your formatting
-
     // Remove the selected transaction.
-    if (isExpense) {
-        accountContainer.getAccount(selectedIndex).removeExpense(selectedTransactionIndex);
-    } else {
-        accountContainer.getAccount(selectedIndex).removeIncome(selectedTransactionIndex);
-    }
+    accountContainer.removeTransactionFromAccount(selectedIndex, selectedTransactionIndex);
 
     // Update the transaction list.
-    updateExpenseIncomeList(selectedIndex);
+    updateTransactionList(selectedIndex);
     updateBalance();
 }
+
 
 // Metodo per aprire un file JSON
 void MainWindow::openFile(const QString &filePath) {
@@ -396,49 +389,43 @@ void MainWindow::updateAccountList() {
 
 
 
-// Method to update the expense and income list
-void MainWindow::updateExpenseIncomeList(int accountIndex) {
+// Method to update the transaction list
+void MainWindow::updateTransactionList(int accountIndex) {
     transactionListWidget->clear();
-
-    try {
-        const Account &account = accountContainer.getAccount(accountIndex);
-
-        for (const Expense &expense : account.getExpenses()) {
-            QString expenseDetails = " -" +QString::number(expense.getAmount()) + " - " + expense.getDescription() + " - " + expense.getDate().toString();
-            transactionListWidget->addItem(expenseDetails);
+    QList<Finance*> transactions = accountContainer.getTransactions(accountIndex);
+    for (const Finance* transaction : transactions) {
+        QString transactionStr;
+        if (dynamic_cast<const Expense*>(transaction)) {
+            transactionStr = " -" + QString::number(transaction->getAmount()) + ": " + transaction->getDescription();
+        } else if (dynamic_cast<const Income*>(transaction)) {
+            transactionStr = " +" + QString::number(transaction->getAmount()) + ": " + transaction->getDescription();
+        } else if (dynamic_cast<const Loan*>(transaction)) {
+            transactionStr = " Loan " + QString::number(transaction->getAmount()) + ": " + transaction->getDescription();
         }
-
-        for (const Income &income : account.getIncomes()) {
-            QString incomeDetails = " +" + QString::number(income.getAmount()) + " - " + income.getDescription() + " - " + income.getDate().toString();
-            transactionListWidget->addItem(incomeDetails);
-        }
-    } catch (const std::out_of_range& e) {
-        qDebug() << "Index out of range: " << e.what();
+        transactionListWidget->addItem(transactionStr);
     }
 }
 
 void MainWindow::updateBalance() {
     int selectedIndex = accountListWidget->currentRow();
     if (selectedIndex < 0) {
-        balanceLabel->clear();
         return;
     }
-
-    try {
-        const Account &account = accountContainer.getAccount(selectedIndex);
-        double balance = 0.0;
-
-        for (const Expense &expense : account.getExpenses()) {
-            balance -= expense.getAmount();
+    double balance = 0.0;
+    QList<Finance*> transactions = accountContainer.getTransactions(selectedIndex);
+    for (const Finance* transaction : transactions) {
+        if (dynamic_cast<const Expense*>(transaction)) {
+            balance -= transaction->getAmount();
+        } else if (dynamic_cast<const Income*>(transaction)) {
+            balance += transaction->getAmount();
+        } else if (const Loan* loan = dynamic_cast<const Loan*>(transaction)) {
+            // For the purpose of this example, a loan reduces the balance if it is not paid
+            if (!loan->isLoanPaid()) {
+                balance -= loan->getAmount();
+            }
         }
-
-        for (const Income &income : account.getIncomes()) {
-            balance += income.getAmount();
-        }
-
-        balanceLabel->setText(tr("Saldo: ") + QString::number(balance));
-    } catch (const std::out_of_range& e) {
-        qDebug() << "Index out of range: " << e.what();
     }
+    balanceLabel->setText(tr("Balance: ") + QString::number(balance));
 }
+
 

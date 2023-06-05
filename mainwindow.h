@@ -80,7 +80,7 @@ private:
     void openFile(const QString &filePath);
     void saveFile(const QString &filePath);
     void updateAccountList();
-    void updateExpenseIncomeList(int accountIndex);
+    void updateTransactionList(int accountIndex);
     void updateBalance();
 };
 #endif // MAINWINDOW_H
