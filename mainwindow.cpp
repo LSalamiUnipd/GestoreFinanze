@@ -149,11 +149,24 @@ void MainWindow::createCentralWidget()
 
 void MainWindow::on_accountListWidget_currentItemChanged(QListWidgetItem* current, QListWidgetItem* previous)
 {
+    Q_UNUSED(previous);
+
     // Get the index of the selected account
     int selectedIndex = accountListWidget->row(current);
+    qDebug() << "Selected Index: " << selectedIndex;
 
-    // Update the transaction list for this account
-    updateTransactionList(selectedIndex);
+    // Check if the selected index is valid
+    if (selectedIndex >= 0 && selectedIndex < accountContainer.getAccounts().size()) {
+        // Update the transaction list for this account
+        try {
+            updateTransactionList(selectedIndex);
+        } catch (const std::out_of_range& e) {
+            qDebug() << "Error updating transaction list: " << e.what();
+        }
+    } else {
+        qDebug() << "Invalid index: " << selectedIndex;
+    }
+
     updateBalance();
 }
 
@@ -306,7 +319,7 @@ void MainWindow::on_actionRemove_Account_triggered() {
 
 void MainWindow::on_actionEdit_Account_triggered() {
     int selectedIndex = accountListWidget->currentRow();
-    if (selectedIndex < 0) {
+    if (selectedIndex < 0 || selectedIndex >= accountContainer.getAccounts().size()) {
         QMessageBox::warning(this, tr("Error"), tr("Nessun account selezionato."));
         return;
     }
@@ -335,12 +348,14 @@ void MainWindow::on_actionRemove_Transaction_triggered() {
         return;
     }
 
-    // Remove the selected transaction.
-    accountContainer.removeTransactionFromAccount(selectedIndex, selectedTransactionIndex);
-
-    // Update the transaction list.
-    updateTransactionList(selectedIndex);
-    updateBalance();
+    try {
+        accountContainer.removeTransactionFromAccount(selectedIndex, selectedTransactionIndex);
+        updateTransactionList(selectedIndex);
+        updateBalance();
+    } catch (const std::out_of_range& e) {
+        qDebug() << "Error removing transaction: " << e.what();
+        QMessageBox::warning(this, tr("Error"), tr("Failed to remove transaction."));
+    }
 }
 
 
@@ -385,12 +400,14 @@ void MainWindow::updateAccountList() {
         QString accountDetails = account.getName() + " - " + account.getDescription();
         accountListWidget->addItem(accountDetails);
     }
-}
 
+    qDebug() << "Account List Size: " << accountContainer.getAccounts().size();
+}
 
 
 // Method to update the transaction list
 void MainWindow::updateTransactionList(int accountIndex) {
+    qDebug() << "Account Index: " << accountIndex;
     transactionListWidget->clear();
     QList<Finance*> transactions = accountContainer.getTransactions(accountIndex);
     for (const Finance* transaction : transactions) {
