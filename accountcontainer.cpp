@@ -182,3 +182,55 @@ QList<Account> AccountContainer::getAccounts() const {
     }
     return accounts;
 }
+
+Finance* AccountContainer::getTransactionFromAccount(int accountIndex, int transactionIndex) {
+    AccountNode* current = head;
+    int count = 0;
+    while (current != nullptr) {
+        if (count == accountIndex) {
+            AccountNode::FinanceNode* transactionCurrent = current->transactionsHead;
+            int transactionCount = 0;
+            while (transactionCurrent != nullptr) {
+                if (transactionCount == transactionIndex) {
+                    return transactionCurrent->transaction;
+                }
+                transactionCurrent = transactionCurrent->next;
+                transactionCount++;
+            }
+            throw std::out_of_range("Transaction index out of range");
+        }
+        current = current->next;
+        count++;
+    }
+    throw std::out_of_range("Account index out of range");
+}
+
+void AccountContainer::setTransactionInAccount(int accountIndex, int transactionIndex, const Finance& transaction) {
+    AccountNode* current = head;
+    int count = 0;
+    while (current != nullptr) {
+        if (count == accountIndex) {
+            AccountNode::FinanceNode* transactionCurrent = current->transactionsHead;
+            int transactionCount = 0;
+            while (transactionCurrent != nullptr) {
+                if (transactionCount == transactionIndex) {
+                    delete transactionCurrent->transaction;
+                    if (dynamic_cast<const Expense*>(&transaction)) {
+                        transactionCurrent->transaction = new Expense(static_cast<const Expense&>(transaction));
+                    } else if (dynamic_cast<const Income*>(&transaction)) {
+                        transactionCurrent->transaction = new Income(static_cast<const Income&>(transaction));
+                    } else if (dynamic_cast<const Loan*>(&transaction)) {
+                        transactionCurrent->transaction = new Loan(static_cast<const Loan&>(transaction));
+                    }
+                    return;
+                }
+                transactionCurrent = transactionCurrent->next;
+                transactionCount++;
+            }
+            throw std::out_of_range("Transaction index out of range");
+        }
+        current = current->next;
+        count++;
+    }
+    throw std::out_of_range("Account index out of range");
+}

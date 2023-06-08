@@ -1,27 +1,18 @@
 #include "editincomedialog.h"
-#include <QFormLayout>
-#include <QLabel>
 
-// Costruttore della classe EditIncomeDialog
-EditIncomeDialog::EditIncomeDialog(Income *incomeToEdit, QWidget *parent)
-    : QDialog(parent), income(incomeToEdit) {
+EditIncomeDialog::EditIncomeDialog(Income& income, QWidget *parent)
+    : QDialog(parent), originalIncome(income), modifiedIncome(income) {
     setWindowTitle("Modifica Entrata");
 
-    // Inizializzazione dei widget di input e dei pulsanti
-    descriptionEdit = new QLineEdit(this);
+    descriptionEdit = new QLineEdit(income.getDescription(), this);
     amountEdit = new QDoubleSpinBox(this);
     amountEdit->setMinimum(0);
     amountEdit->setMaximum(9999999);
     amountEdit->setDecimals(2);
-    dateEdit = new QDateEdit(QDate::currentDate(), this);
+    amountEdit->setValue(income.getAmount());
+    dateEdit = new QDateEdit(income.getDate(), this);
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
 
-    // Precompila i campi con i dati dell'entrata da modificare
-    descriptionEdit->setText(income->getDescription());
-    amountEdit->setValue(income->getAmount());
-    dateEdit->setDate(income->getDate());
-
-    // Layout e aggiunta dei widget
     QFormLayout *formLayout = new QFormLayout;
     formLayout->addRow(new QLabel("Descrizione:"), descriptionEdit);
     formLayout->addRow(new QLabel("Importo:"), amountEdit);
@@ -30,18 +21,29 @@ EditIncomeDialog::EditIncomeDialog(Income *incomeToEdit, QWidget *parent)
 
     setLayout(formLayout);
 
-    // Connessione dei pulsanti alle funzioni di QDialog
     connect(buttonBox, &QDialogButtonBox::accepted, this, &EditIncomeDialog::accept);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &EditIncomeDialog::reject);
 }
 
-// Metodo che viene chiamato quando il pulsante OK viene premuto
-void EditIncomeDialog::accept() {
-    // Aggiorna i dati dell'entrata con i nuovi valori inseriti
-    income->setDescription(descriptionEdit->text());
-    income->setAmount(amountEdit->value());
-    income->setDate(dateEdit->date());
+QString EditIncomeDialog::getIncomeDescription() const {
+    return descriptionEdit->text();
+}
 
-    // Chiama il metodo accept della classe base QDialog per chiudere il dialogo
+double EditIncomeDialog::getIncomeAmount() const {
+    return amountEdit->value();
+}
+
+QDate EditIncomeDialog::getIncomeDate() const {
+    return dateEdit->date();
+}
+
+Income EditIncomeDialog::getModifiedIncome() const {
+    return modifiedIncome;
+}
+
+void EditIncomeDialog::accept() {
+    modifiedIncome.setDescription(getIncomeDescription());
+    modifiedIncome.setAmount(getIncomeAmount());
+    modifiedIncome.setDate(getIncomeDate());
     QDialog::accept();
 }

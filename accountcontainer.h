@@ -21,6 +21,8 @@ public:
     void addTransactionToAccount(int index, const Finance &transaction);
     void removeTransactionFromAccount(int accountIndex, int transactionIndex);
     QList<Finance*> getTransactions(int accountIndex) const;
+    Finance* getTransactionFromAccount(int accountIndex, int transactionIndex);
+    void setTransactionInAccount(int accountIndex, int transactionIndex, const Finance& transaction);
 
     QList<Account> getAccounts() const;
 

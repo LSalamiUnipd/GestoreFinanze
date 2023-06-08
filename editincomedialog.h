@@ -2,27 +2,37 @@
 #define EDITINCOMEDIALOG_H
 
 #include <QDialog>
-#include <QDialogButtonBox>
 #include <QLineEdit>
+#include <QTextEdit>
 #include <QDoubleSpinBox>
 #include <QDateEdit>
-#include "income.h" // Include your Income header file here
+#include <QDialogButtonBox>
+#include <QFormLayout>
+#include <QLabel>
+#include <income.h>
 
 class EditIncomeDialog : public QDialog {
     Q_OBJECT
 
 public:
-    explicit EditIncomeDialog(Income *incomeToEdit, QWidget *parent = nullptr);
+    explicit EditIncomeDialog(Income& income, QWidget *parent = nullptr);
+
+    Income getModifiedIncome() const;
+    QString getIncomeDescription() const;
+    double getIncomeAmount() const;
+    QDate getIncomeDate() const;
 
 private slots:
     void accept() override;
 
 private:
-    QLineEdit *descriptionEdit;
-    QDoubleSpinBox *amountEdit;
-    QDateEdit *dateEdit;
-    QDialogButtonBox *buttonBox;
-    Income *income; // The income to edit
+    Income &originalIncome;
+    Income modifiedIncome;
+
+    QLineEdit* descriptionEdit;
+    QDoubleSpinBox* amountEdit;
+    QDateEdit* dateEdit;
+    QDialogButtonBox* buttonBox;
 };
 
 #endif // EDITINCOMEDIALOG_H
