@@ -14,6 +14,9 @@
 #include "addincomedialog.h"
 #include "addloandialog.h"
 #include "editaccountdialog.h"
+#include "editexpensedialog.h"
+#include "editincomedialog.h"
+#include "editloandialog.h"
 #include "expense.h"
 #include "income.h"
 #include "loan.h"
@@ -76,6 +79,8 @@ void MainWindow::createActions()
     removeTransactionAction = new QAction(tr("&Rimuovi Transazione"), this);
     connect(removeTransactionAction, &QAction::triggered, this, &MainWindow::on_actionRemove_Transaction_triggered);
 
+    editTransactionAction = new QAction(tr("&Modifica Transazione"), this);
+    connect(editTransactionAction, &QAction::triggered, this, &MainWindow::on_actionEdit_Transaction_triggered);
 }
 
 void MainWindow::createMenus()
@@ -96,6 +101,7 @@ void MainWindow::createMenus()
     editMenu->addAction(removeAccountAction);
     editMenu->addAction(editAccountAction);
     editMenu->addAction(removeTransactionAction);
+    editMenu->addAction(editTransactionAction);
 }
 
 void MainWindow::createToolBars()
@@ -113,6 +119,7 @@ void MainWindow::createToolBars()
     editToolBar->addAction(removeAccountAction);
     editToolBar->addAction(editAccountAction);
     editToolBar->addAction(removeTransactionAction);
+    editToolBar->addAction(editTransactionAction);
 }
 
 void MainWindow::createStatusBar()
@@ -358,6 +365,42 @@ void MainWindow::on_actionRemove_Transaction_triggered() {
     }
 }
 
+void MainWindow::on_actionEdit_Transaction_triggered() {
+    int selectedAccountIndex = accountListWidget->currentRow();
+    int selectedTransactionIndex = transactionListWidget->currentRow();
+    if (selectedAccountIndex < 0 || selectedTransactionIndex < 0) {
+        QMessageBox::warning(this, tr("Error"), tr("No account or transaction selected."));
+        return;
+    }
+
+    // Ottieni la transazione corrente
+    Finance* currentTransaction = accountContainer.getTransactionFromAccount(selectedAccountIndex, selectedTransactionIndex);
+
+    // Decidi il tipo di dialogo da mostrare sulla base del tipo di transazione
+    if (Expense* expense = dynamic_cast<Expense*>(currentTransaction)) {
+        EditExpenseDialog* editDialog = new EditExpenseDialog(*expense, this);
+        if (editDialog->exec() == QDialog::Accepted) {
+            *expense = editDialog->getModifiedExpense();
+        }
+        delete editDialog;
+    } else if (Income* income = dynamic_cast<Income*>(currentTransaction)) {
+        EditIncomeDialog* editDialog = new EditIncomeDialog(*income, this);
+        if (editDialog->exec() == QDialog::Accepted) {
+            *income = editDialog->getModifiedIncome();
+        }
+        delete editDialog;
+    } else if (Loan* loan = dynamic_cast<Loan*>(currentTransaction)) {
+        EditLoanDialog* editDialog = new EditLoanDialog(*loan, this);
+        if (editDialog->exec() == QDialog::Accepted) {
+            *loan = editDialog->getModifiedLoan();
+        }
+        delete editDialog;
+    }
+
+    // Aggiorna la lista delle transazioni
+    updateTransactionList(selectedAccountIndex);
+}
+
 
 // Metodo per aprire un file JSON
 void MainWindow::openFile(const QString &filePath) {
@@ -442,7 +485,5 @@ void MainWindow::updateBalance() {
             }
         }
     }
-    balanceLabel->setText(tr("Balance: ") + QString::number(balance));
+    balanceLabel->setText(tr("Saldo: ") + QString::number(balance));
 }
-
-

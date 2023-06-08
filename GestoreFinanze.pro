@@ -16,6 +16,9 @@ SOURCES += \
     addincomedialog.cpp \
     addloandialog.cpp \
     editaccountdialog.cpp \
+    editexpensedialog.cpp \
+    editincomedialog.cpp \
+    editloandialog.cpp \
     expense.cpp \
     finance.cpp \
     income.cpp \
@@ -32,6 +35,9 @@ HEADERS += \
     addincomedialog.h \
     addloandialog.h \
     editaccountdialog.h \
+    editexpensedialog.h \
+    editincomedialog.h \
+    editloandialog.h \
     expense.h \
     finance.h \
     income.h \

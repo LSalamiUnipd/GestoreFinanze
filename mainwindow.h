@@ -39,6 +39,7 @@ private slots:
     void on_actionRemove_Account_triggered();
     void on_actionEdit_Account_triggered();
     void on_actionRemove_Transaction_triggered();
+    void on_actionEdit_Transaction_triggered();
 
 private:
     Ui::MainWindow *ui;
@@ -72,6 +73,7 @@ private:
     QAction *removeAccountAction;
     QAction *editAccountAction;
     QAction *removeTransactionAction;
+    QAction *editTransactionAction;
 
     QToolBar *fileToolBar;
     QToolBar *editToolBar;
