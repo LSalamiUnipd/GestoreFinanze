@@ -13,12 +13,13 @@ public:
     // Costruttore
     explicit JsonHandler(const QString &filePath);
 
-    // Metodo per leggere i dati dell'applicazione da un file JSON
-    bool readJson(QFile &file, AccountContainer &accountContainer);
+    // Legge i dati dell'applicazione da un file JSON.
+    // Restituisce 'true' se l'operazione ha successo, 'false' in caso contrario.
+    bool readJson(const QString &filePath, AccountContainer &accountContainer);
 
-    // Metodo per scrivere i dati dell'applicazione su un file JSON
-    bool writeJson(QFile &file, const AccountContainer &accountContainer);
-
+    // Scrive i dati dell'applicazione in un file JSON.
+    // Restituisce 'true' se l'operazione ha successo, 'false' in caso contrario.
+    bool writeJson(const QString &filePath, const AccountContainer &accountContainer);
 
 
 private:
@@ -28,8 +29,7 @@ private:
     QJsonArray accountContainerToJsonArray(const AccountContainer &accountContainer) const;
 
     // Metodo per convertire un oggetto QJsonArray in un AccountContainer
-    void jsonArrayToAccountContainer(const QJsonArray &jsonArray, AccountContainer &accountContainer);
-
+    bool jsonArrayToAccountContainer(const QJsonArray &jsonArray, AccountContainer &accountContainer);
 };
 
 #endif // JSONHANDLER_H

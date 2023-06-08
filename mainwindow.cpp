@@ -404,32 +404,22 @@ void MainWindow::on_actionEdit_Transaction_triggered() {
 
 // Metodo per aprire un file JSON
 void MainWindow::openFile(const QString &filePath) {
-    QFile file(filePath);
-    if (!file.open(QIODevice::ReadOnly)) {
-        QMessageBox::critical(this, tr("Error"), tr("Cannot open file for reading."));
+    if (!jsonHandler.readJson(filePath, accountContainer)) {
+        QMessageBox::critical(this, tr("Error"), tr("Impossibile aprire il file per la lettura."));
         return;
     }
-
-    jsonHandler.readJson(file, accountContainer);
-    file.close();
 
     currentFilePath = filePath;
     updateAccountList();
 }
 
 
-
-
 // Metodo per salvare un file JSON
 void MainWindow::saveFile(const QString &filePath) {
-    QFile file(filePath);
-    if (!file.open(QIODevice::WriteOnly)) {
-        QMessageBox::critical(this, tr("Error"), tr("Cannot open file for writing."));
+    if (!jsonHandler.writeJson(filePath, accountContainer)) {
+        QMessageBox::critical(this, tr("Error"), tr("Non è possibile salvare il file."));
         return;
     }
-
-    jsonHandler.writeJson(file, accountContainer);
-    file.close();
 
     currentFilePath = filePath;
 }
