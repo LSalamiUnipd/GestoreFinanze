@@ -34,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent)
     createStatusBar();
     createCentralWidget();
     connect(accountListWidget, &QListWidget::currentItemChanged, this, &MainWindow::on_accountListWidget_currentItemChanged);
+
 }
 
 // Distruttore
@@ -315,7 +316,7 @@ void MainWindow::on_actionRemove_Account_triggered() {
 
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(this, tr("Remove Account"), tr("Are you sure you want to remove the selected account?"),
-                                  QMessageBox::Yes | QMessageBox::No);
+    QMessageBox::Yes | QMessageBox::No);
 
     if (reply == QMessageBox::Yes) {
         accountContainer.removeAccount(selectedIndex);
@@ -399,6 +400,7 @@ void MainWindow::on_actionEdit_Transaction_triggered() {
 
     // Aggiorna la lista delle transazioni
     updateTransactionList(selectedAccountIndex);
+    updateBalance();
 }
 
 
