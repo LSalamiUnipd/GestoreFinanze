@@ -4,7 +4,7 @@
 #include <QString>
 #include <QDate>
 
-// Dichiarazione della classe astratta base Finance
+// Classe astratta base Finance
 class Finance {
 public:
     // Costruttore
@@ -13,17 +13,17 @@ public:
     // Distruttore virtuale
     virtual ~Finance();
 
-    // Metodi getter
+    // Getter per la descrizione, l'importo e la data
     QString getDescription() const;
     double getAmount() const;
     QDate getDate() const;
 
-    // Metodo setter
+    // Setter per la descrizione, l'importo e la data
     void setDescription(const QString &description);
     void setAmount(double amount);
     void setDate(const QDate &date);
 
-    // Metodo virtuale puro per ottenere il tipo di transazione finanziaria (ad es. "Expense" o "Income")
+    // Metodo virtuale puro per ottenere il tipo di transazione finanziaria
     virtual QString getType() const = 0;
 
 private:

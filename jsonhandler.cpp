@@ -9,19 +9,19 @@
 JsonHandler::JsonHandler() {
 }
 
-// Costruttore della classe JsonHandler
+// Costruttore di JsonHandler
 JsonHandler::JsonHandler(const QString &filePath)
     : filePath(filePath) {
     QFile file(filePath);
     qDebug() << "File path: " << filePath;
 }
 
-// Metodo per leggere i dati dell'applicazione da un file JSON
+// Legge i dati dell'applicazione da un file JSON
 bool JsonHandler::readJson(const QString &filePath, AccountContainer &accountContainer) {
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly)) {
         qCritical() << "Non è possibile aprire il file" << filePath << "per la lettura:" << file.errorString();
-                                                                                            return false;
+        return false;
     }
 
     QByteArray jsonData = file.readAll();
@@ -47,7 +47,7 @@ bool JsonHandler::readJson(const QString &filePath, AccountContainer &accountCon
     return true;
 }
 
-// Metodo per scrivere i dati dell'applicazione su un file JSON
+// Scrive i dati dell'applicazione in un file JSON
 bool JsonHandler::writeJson(const QString &filePath, const AccountContainer &accountContainer) {
     QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly)) {
@@ -67,7 +67,7 @@ bool JsonHandler::writeJson(const QString &filePath, const AccountContainer &acc
 
 
 
-// Method to convert an AccountContainer to a QJsonArray
+// Converte un AccountContainer in un oggetto QJsonArray
 QJsonArray JsonHandler::accountContainerToJsonArray(const AccountContainer &accountContainer) const {
     QJsonArray jsonArray;
 
@@ -106,7 +106,7 @@ QJsonArray JsonHandler::accountContainerToJsonArray(const AccountContainer &acco
 
 
 
-// Method to convert a QJsonArray to an AccountContainer
+// Converte un oggetto QJsonArray in un AccountContainer
 bool JsonHandler::jsonArrayToAccountContainer(const QJsonArray &jsonArray, AccountContainer &accountContainer) {
     for (const QJsonValue &value : jsonArray) {
         QJsonObject accountObject = value.toObject();

@@ -1,9 +1,11 @@
 #include "editloandialog.h"
 
+// Costruttore
 EditLoanDialog::EditLoanDialog(Loan& loan, QWidget *parent)
     : QDialog(parent), originalLoan(loan), modifiedLoan(loan) {
     setWindowTitle("Modifica Prestito");
 
+    // Inizializzazione dei widget di input con i valori del Loan da modificare
     descriptionEdit = new QLineEdit(loan.getDescription(), this);
     amountEdit = new QDoubleSpinBox(this);
     amountEdit->setMinimum(0);
@@ -23,6 +25,7 @@ EditLoanDialog::EditLoanDialog(Loan& loan, QWidget *parent)
     paidCheckBox->setChecked(loan.isLoanPaid());
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
 
+    // Creazione e assegnazione del layout
     QFormLayout *formLayout = new QFormLayout;
     formLayout->addRow(new QLabel("Descrizione:"), descriptionEdit);
     formLayout->addRow(new QLabel("Importo:"), amountEdit);
@@ -34,10 +37,12 @@ EditLoanDialog::EditLoanDialog(Loan& loan, QWidget *parent)
 
     setLayout(formLayout);
 
+    // Collegamento dei pulsanti di accettazione e rifiuto agli slot appropriati
     connect(buttonBox, &QDialogButtonBox::accepted, this, &EditLoanDialog::accept);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &EditLoanDialog::reject);
 }
 
+// Implementazione dei getter
 QString EditLoanDialog::getLoanDescription() const {
     return descriptionEdit->text();
 }
@@ -66,6 +71,7 @@ Loan EditLoanDialog::getModifiedLoan() const {
     return modifiedLoan;
 }
 
+// Slot di accettazione: modifica il Loan e chiude il dialogo
 void EditLoanDialog::accept() {
     modifiedLoan.setDescription(getLoanDescription());
     modifiedLoan.setAmount(getLoanAmount());

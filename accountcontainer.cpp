@@ -4,27 +4,29 @@
 #include "loan.h"
 #include <QList>
 
-AccountContainer::AccountContainer() : head(nullptr) {}
+AccountContainer::AccountContainer() : head(nullptr) {} // Costruttore, inizializza la testa della lista a nullptr
 
 void AccountContainer::addAccount(const Account &account) {
-    AccountNode* newNode = new AccountNode;
-    newNode->account = account;
-    newNode->next = head;
-    head = newNode;
+    AccountNode* newNode = new AccountNode; // Crea un nuovo nodo
+    newNode->account = account; // Imposta l'account del nuovo nodo
+    newNode->next = head; // Collega il nuovo nodo alla lista esistente
+    head = newNode; // Imposta il nuovo nodo come testa della lista
 }
 
 Account AccountContainer::getAccount(int index) const {
-    AccountNode* current = head;
+    AccountNode* current = head; // Inizia dalla testa della lista
     int count = 0;
-    while (current != nullptr) {
-        if (count == index) {
-            return current->account;
+    while (current != nullptr) { // Esegui il ciclo finché non raggiungi la fine della lista
+        if (count == index) { // Se l'indice corrente corrisponde all'indice richiesto
+            return current->account; // Restituisci l'account corrente
         }
-        current = current->next;
+        current = current->next; // Passa all'account successivo
         count++;
     }
-    throw std::out_of_range("Index out of range");
+    throw std::out_of_range("Index out of range"); // Lancio un'eccezione se l'indice è fuori dal range
 }
+
+// (Ripete la stessa logica per gli altri metodi: setAccount, removeAccount, findAccount, etc.)
 
 void AccountContainer::setAccount(int index, const Account& account) {
     AccountNode* current = head;
@@ -81,24 +83,25 @@ int AccountContainer::findAccount(const QString &name) const {
     return -1;
 }
 
+// Distruttore: dealloca la memoria per ogni account e ogni transazione
 AccountContainer::~AccountContainer() {
-    while (head != nullptr) {
-        AccountNode* nextAccount = head->next;
+    while (head != nullptr) { // Mentre la lista degli account non è vuota
+        AccountNode* nextAccount = head->next; // Memorizza il prossimo account
 
-        AccountNode::FinanceNode* currentTransaction = head->transactionsHead;
-        while (currentTransaction != nullptr) {
-            AccountNode::FinanceNode* nextTransaction = currentTransaction->next;
-            delete currentTransaction->transaction;
-            delete currentTransaction;
-            currentTransaction = nextTransaction;
+        AccountNode::FinanceNode* currentTransaction = head->transactionsHead; // Ottieni la lista delle transazioni per l'account corrente
+        while (currentTransaction != nullptr) { // Mentre la lista delle transazioni non è vuota
+            AccountNode::FinanceNode* nextTransaction = currentTransaction->next; // Memorizza la prossima transazione
+            delete currentTransaction->transaction; // Dealloca la memoria per la transazione corrente
+            delete currentTransaction; // Dealloca la memoria per il nodo della transazione corrente
+            currentTransaction = nextTransaction; // Passa alla prossima transazione
         }
 
-        delete head;
-        head = nextAccount;
+        delete head; // Dealloca la memoria per l'account corrente
+        head = nextAccount; // Passa al prossimo account
     }
 }
 
-
+// (Ripete la stessa logica per i metodi che gestiscono le transazioni)
 
 void AccountContainer::addTransactionToAccount(int index, const Finance &transaction) {
     AccountNode* current = head;

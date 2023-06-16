@@ -6,29 +6,27 @@
 #include <QJsonDocument>
 #include "accountcontainer.h"
 
-// Dichiarazione della classe JsonHandler
+// Classe JsonHandler per gestire le operazioni di lettura e scrittura su file JSON
 class JsonHandler {
 public:
+    // Costruttori
     JsonHandler();
-    // Costruttore
     explicit JsonHandler(const QString &filePath);
 
-    // Legge i dati dell'applicazione da un file JSON.
-    // Restituisce 'true' se l'operazione ha successo, 'false' in caso contrario.
+    // Legge i dati dell'applicazione da un file JSON, ritorna 'true' in caso di successo
     bool readJson(const QString &filePath, AccountContainer &accountContainer);
 
-    // Scrive i dati dell'applicazione in un file JSON.
-    // Restituisce 'true' se l'operazione ha successo, 'false' in caso contrario.
-    bool writeJson(const QString &filePath, const AccountContainer &accountContainer);
+    // Scrive i dati dell'applicazione in un file JSON, ritorna 'true' in caso di successo
+   bool writeJson(const QString &filePath, const AccountContainer &accountContainer);
 
 
 private:
     QString filePath; // Percorso del file JSON
 
-    // Metodo per convertire un AccountContainer in un oggetto QJsonArray
+    // Converte un AccountContainer in un oggetto QJsonArray
     QJsonArray accountContainerToJsonArray(const AccountContainer &accountContainer) const;
 
-    // Metodo per convertire un oggetto QJsonArray in un AccountContainer
+    // Converte un oggetto QJsonArray in un AccountContainer
     bool jsonArrayToAccountContainer(const QJsonArray &jsonArray, AccountContainer &accountContainer);
 };
 

@@ -8,28 +8,22 @@
 #include <QDateEdit>
 #include <QDialogButtonBox>
 
-// Dichiarazione della classe AddIncomeDialog
+// Classe AddIncomeDialog per aggiungere un nuovo reddito tramite un dialog
 class AddIncomeDialog : public QDialog {
     Q_OBJECT
 
 public:
-    // Costruttore
-    explicit AddIncomeDialog(QWidget *parent = nullptr);
+    explicit AddIncomeDialog(QWidget *parent = nullptr); // Costruttore
 
-    // Metodo per ottenere la descrizione dell'entrata
-    QString getIncomeDescription() const;
-
-    // Metodo per ottenere l'importo dell'entrata
-    double getIncomeAmount() const;
-
-    // Metodo per ottenere la data dell'entrata
-    QDate getIncomeDate() const;
+    QString getIncomeDescription() const; // Ottiene la descrizione del reddito
+    double getIncomeAmount() const; // Ottiene l'importo del reddito
+    QDate getIncomeDate() const; // Ottiene la data del reddito
 
 private:
-    QLineEdit *descriptionEdit;     // Campo di input per la descrizione dell'entrata
-    QDoubleSpinBox *amountEdit;     // Campo di input per l'importo dell'entrata
-    QDateEdit *dateEdit;            // Campo di input per la data dell'entrata
-    QDialogButtonBox *buttonBox;    // Pulsanti di conferma e annullamento
+    QLineEdit *descriptionEdit; // Campo per inserire la descrizione del reddito
+    QDoubleSpinBox *amountEdit; // Campo per inserire l'importo del reddito
+    QDateEdit *dateEdit; // Campo per inserire la data del reddito
+    QDialogButtonBox *buttonBox; // Pulsanti di conferma e annullamento
 };
 
 #endif // ADDINCOMEDIALOG_H

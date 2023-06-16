@@ -3,13 +3,13 @@
 
 #include "finance.h"
 
-// Dichiarazione della classe Expense, che estende la classe Finance
+// Classe Expense estende Finance
 class Expense : public Finance {
 public:
     // Costruttore
     Expense(const QString &description, double amount, const QDate &date);
 
-    // Metodo per ottenere il tipo di transazione finanziaria (implementazione del metodo virtuale puro)
+    // Implementazione del metodo virtuale puro per ottenere il tipo di transazione finanziaria
     QString getType() const override;
 };
 

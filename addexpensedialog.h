@@ -8,28 +8,22 @@
 #include <QDateEdit>
 #include <QDialogButtonBox>
 
-// Dichiarazione della classe AddExpenseDialog
+// Classe AddExpenseDialog per aggiungere una nuova spesa tramite un dialog
 class AddExpenseDialog : public QDialog {
     Q_OBJECT
 
 public:
-    // Costruttore
-    explicit AddExpenseDialog(QWidget *parent = nullptr);
+    explicit AddExpenseDialog(QWidget *parent = nullptr); // Costruttore
 
-    // Metodo per ottenere la descrizione della spesa
-    QString getExpenseDescription() const;
-
-    // Metodo per ottenere l'importo della spesa
-    double getExpenseAmount() const;
-
-    // Metodo per ottenere la data della spesa
-    QDate getExpenseDate() const;
+    QString getExpenseDescription() const; // Ottiene la descrizione della spesa
+    double getExpenseAmount() const; // Ottiene l'importo della spesa
+    QDate getExpenseDate() const; // Ottiene la data della spesa
 
 private:
-    QLineEdit *descriptionEdit;     // Campo di input per la descrizione della spesa
-    QDoubleSpinBox *amountEdit;     // Campo di input per l'importo della spesa
-    QDateEdit *dateEdit;            // Campo di input per la data della spesa
-    QDialogButtonBox *buttonBox;    // Pulsanti di conferma e annullamento
+    QLineEdit *descriptionEdit; // Campo per inserire la descrizione della spesa
+    QDoubleSpinBox *amountEdit; // Campo per inserire l'importo della spesa
+    QDateEdit *dateEdit; // Campo per inserire la data della spesa
+    QDialogButtonBox *buttonBox; // Pulsanti di conferma e annullamento
 };
 
 #endif // ADDEXPENSEDIALOG_H

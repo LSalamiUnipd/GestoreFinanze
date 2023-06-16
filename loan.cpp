@@ -1,15 +1,15 @@
 #include "loan.h"
 
-// Costruttore della classe Loan
+// Implementazione del costruttore di Loan
 Loan::Loan(const QString &description, double amount, const QDate &date, int duration, double interestRate, bool isPaid)
     : Finance(description, amount, date), duration(duration), interestRate(interestRate), isPaid(isPaid) {
 }
 
-// Distruttore della classe Loan
+// Implementazione del distruttore di Loan
 Loan::~Loan() {
 }
 
-// Metodi getter per i nuovi attributi
+// Implementazione dei getter per la durata, tasso d'interesse e stato del prestito
 int Loan::getDuration() const {
     return duration;
 }
@@ -22,7 +22,7 @@ bool Loan::isLoanPaid() const {
     return isPaid;
 }
 
-// Metodi setter per i nuovi attributi
+// Implementazione dei setter per la durata, tasso d'interesse e stato del prestito
 void Loan::setDuration(int duration) {
     this->duration = duration;
 }
@@ -35,7 +35,7 @@ void Loan::setLoanPaid(bool isPaid) {
     this->isPaid = isPaid;
 }
 
-// Implementazione del metodo getType()
+// Implementazione del metodo per ottenere il tipo di transazione finanziaria
 QString Loan::getType() const {
     return "Loan";
 }

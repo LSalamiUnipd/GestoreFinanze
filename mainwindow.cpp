@@ -7,8 +7,8 @@
 #include <QAction>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QVBoxLayout> // Include this for the vertical box layout
-#include <QListWidget> // Include this for the list widget
+#include <QVBoxLayout>
+#include <QListWidget>
 #include "addaccountdialog.h"
 #include "addexpensedialog.h"
 #include "addincomedialog.h"
@@ -26,15 +26,21 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent){
 
+    // Imposta le dimensioni della finestra principale
     resize(800, 600);
 
+    // Crea le azioni
     createActions();
+    // Crea i menu
     createMenus();
+    // Crea le barre degli strumenti
     createToolBars();
+    // Crea la barra di stato
     createStatusBar();
+    // Crea il widget centrale
     createCentralWidget();
+    // Connetti il segnale 'currentItemChanged' del widget accountListWidget allo slot 'on_accountListWidget_currentItemChanged'
     connect(accountListWidget, &QListWidget::currentItemChanged, this, &MainWindow::on_accountListWidget_currentItemChanged);
-
 }
 
 // Distruttore
@@ -43,22 +49,29 @@ MainWindow::~MainWindow() {
 
 void MainWindow::createActions()
 {
+    // Crea l'azione "Apri"
     openAction = new QAction(tr("&Apri"), this);
+    // Imposta il tasto di scelta rapida per l'azione "Apri"
     openAction->setShortcut(QKeySequence::Open);
+    // Connetti il segnale 'triggered' dell'azione 'openAction' allo slot 'on_actionOpen_triggered'
     connect(openAction, &QAction::triggered, this, &MainWindow::on_actionOpen_triggered);
 
+    // Azione per salvare un file
     saveAction = new QAction(tr("&Salva"), this);
     saveAction->setShortcut(QKeySequence::Save);
     connect(saveAction, &QAction::triggered, this, &MainWindow::on_actionSave_triggered);
 
+    // Azione per salvare un file con un nuovo nome
     saveAsAction = new QAction(tr("&Salva con nome..."), this);
     saveAsAction->setShortcut(QKeySequence::SaveAs);
     connect(saveAsAction, &QAction::triggered, this, &MainWindow::on_actionSave_As_triggered);
 
+    // Azione per uscire dall'applicazione
     exitAction = new QAction(tr("&Esci"), this);
     exitAction->setShortcut(QKeySequence::Quit);
     connect(exitAction, &QAction::triggered, this, &MainWindow::on_actionExit_triggered);
 
+    // Azioni per gestire gli account e le transazioni
     addAccountAction = new QAction(tr("&Aggiungi Account"), this);
     connect(addAccountAction, &QAction::triggered, this, &MainWindow::on_actionAdd_Account_triggered);
 
@@ -83,11 +96,14 @@ void MainWindow::createActions()
     editTransactionAction = new QAction(tr("&Modifica Transazione"), this);
     connect(editTransactionAction, &QAction::triggered, this, &MainWindow::on_actionEdit_Transaction_triggered);
 }
-
+// Crea i menu
 void MainWindow::createMenus()
 {
+    // Crea il menu "File"
     fileMenu = menuBar()->addMenu(tr("&File"));
+    // Aggiungi l'azione "Apri" al menu "File"
     fileMenu->addAction(openAction);
+    // (Analogamente per le altre azioni...)
     fileMenu->addAction(saveAction);
     fileMenu->addAction(saveAsAction);
     fileMenu->addSeparator();
@@ -105,10 +121,14 @@ void MainWindow::createMenus()
     editMenu->addAction(editTransactionAction);
 }
 
+// Crea le barre degli strumenti
 void MainWindow::createToolBars()
 {
+    // Crea la barra degli strumenti "File"
     fileToolBar = addToolBar(tr("File"));
+    // Aggiungi l'azione "Apri" alla barra degli strumenti "File"
     fileToolBar->addAction(openAction);
+    // (Analogamente per le altre azioni...)
     fileToolBar->addAction(saveAction);
     fileToolBar->addAction(saveAsAction);
 
@@ -123,22 +143,25 @@ void MainWindow::createToolBars()
     editToolBar->addAction(editTransactionAction);
 }
 
+// Crea la barra di stato
 void MainWindow::createStatusBar()
 {
+    // Mostra il messaggio "Pronto" nella barra di stato
     statusBar()->showMessage(tr("Pronto"));
 }
 
+// Questa funzione crea il widget centrale dell'interfaccia, composto da due liste (account e transazioni) e da un'etichetta per il saldo.
 void MainWindow::createCentralWidget()
 {
     accountListWidget = new QListWidget(this);
     transactionListWidget = new QListWidget(this);
 
-    // Create labels
+    // Creiamo le etichette per i nostri widget
     accountListWidgetLabel = new QLabel(tr("Account"), this);
     transactionListWidgetLabel = new QLabel(tr("Transazioni"), this);
     balanceLabel = new QLabel(this);
 
-    // Create a layout and add widgets to it
+    // Creiamo un layout verticale e aggiungiamo i nostri widget
     QVBoxLayout* layout = new QVBoxLayout();
     layout->addWidget(accountListWidgetLabel);
     layout->addWidget(accountListWidget);
@@ -147,47 +170,48 @@ void MainWindow::createCentralWidget()
     layout->addWidget(balanceLabel);
 
 
-    // Create a central widget and set the layout
+    // Creiamo un widget centrale e gli assegniamo il layout che abbiamo appena creato
     QWidget* centralWidget = new QWidget(this);
     centralWidget->setLayout(layout);
 
-    // Set the central widget
+    // Impostiamo il widget centrale dell'interfaccia
     setCentralWidget(centralWidget);
 }
 
+// Questa funzione viene chiamata quando un elemento della lista degli account viene selezionato. Aggiorna la lista delle transazioni e il saldo.
 void MainWindow::on_accountListWidget_currentItemChanged(QListWidgetItem* current, QListWidgetItem* previous)
 {
     Q_UNUSED(previous);
 
-    // Get the index of the selected account
+    // Otteniamo l'indice dell'account selezionato
     int selectedIndex = accountListWidget->row(current);
-    qDebug() << "Selected Index: " << selectedIndex;
+    qDebug() << "Indice selezionato: " << selectedIndex;
 
-    // Check if the selected index is valid
+    // Verifichiamo se l'indice selezionato è valido
     if (selectedIndex >= 0 && selectedIndex < accountContainer.getAccounts().size()) {
-        // Update the transaction list for this account
+        // Aggiorniamo la lista delle transazioni per questo account
         try {
             updateTransactionList(selectedIndex);
         } catch (const std::out_of_range& e) {
-            qDebug() << "Error updating transaction list: " << e.what();
+            qDebug() << "Errore nell'aggiornamento della lista di transazioni: " << e.what();
         }
     } else {
-        qDebug() << "Invalid index: " << selectedIndex;
+        qDebug() << "Indice non valido: " << selectedIndex;
     }
 
+    // Aggiorniamo il saldo
     updateBalance();
 }
 
-
-// Slot per aprire un file JSON
+// Questo slot viene eseguito quando si tenta di aprire un file JSON
 void MainWindow::on_actionOpen_triggered() {
-    QString filePath = QFileDialog::getOpenFileName(this, tr("Open File"), QString(), tr("JSON Files (*.json)"));
+    QString filePath = QFileDialog::getOpenFileName(this, tr("Apri File"), QString(), tr("JSON Files (*.json)"));
     if (!filePath.isEmpty()) {
         openFile(filePath);
     }
 }
 
-// Slot per salvare il file JSON corrente
+// Questo slot viene attivato quando si cerca di salvare il file JSON corrente
 void MainWindow::on_actionSave_triggered() {
     if (currentFilePath.isEmpty()) {
         on_actionSave_As_triggered();
@@ -196,20 +220,20 @@ void MainWindow::on_actionSave_triggered() {
     }
 }
 
-// Slot per salvare il file JSON con un nuovo nome
+// Questo slot viene utilizzato per salvare un file JSON con un nome diverso
 void MainWindow::on_actionSave_As_triggered() {
-    QString filePath = QFileDialog::getSaveFileName(this, tr("Save File As"), QString(), tr("JSON Files (*.json)"));
+    QString filePath = QFileDialog::getSaveFileName(this, tr("Salva File Con Nome"), QString(), tr("JSON Files (*.json)"));
     if (!filePath.isEmpty()) {
         saveFile(filePath);
     }
 }
 
-// Slot per uscire dall'applicazione
+// Questo slot permette l'uscita dall'applicazione
 void MainWindow::on_actionExit_triggered() {
     QApplication::quit();
 }
 
-// Slot per aggiungere un nuovo account
+// Questo slot viene utilizzato per creare un nuovo account
 void MainWindow::on_actionAdd_Account_triggered() {
     AddAccountDialog dialog(this);
     if (dialog.exec() == QDialog::Accepted) {
@@ -220,12 +244,11 @@ void MainWindow::on_actionAdd_Account_triggered() {
     updateBalance();
 }
 
-
-// Slot per aggiungere una nuova spesa
+// Questo slot viene utilizzato per l'aggiunta di una nuova spesa
 void MainWindow::on_actionAdd_Expense_triggered() {
     int selectedIndex = accountListWidget->currentRow();
     if (selectedIndex < 0) {
-        QMessageBox::warning(this, tr("Error"), tr("No account selected."));
+        QMessageBox::warning(this, tr("Errore"), tr("Nesssun account selezionato."));
         return;
     }
 
@@ -241,19 +264,18 @@ void MainWindow::on_actionAdd_Expense_triggered() {
             accountContainer.addTransactionToAccount(selectedIndex, newExpense);
             updateTransactionList(selectedIndex);
         } catch (const std::out_of_range& e) {
-            qDebug() << "Error adding expense: " << e.what();
-            QMessageBox::warning(this, tr("Error"), tr("Failed to add expense."));
+            qDebug() << "Errore nell'aggiunta della spesa: " << e.what();
+            QMessageBox::warning(this, tr("Errore"), tr("Aggiunta della spesa non riuscita."));
         }
     }
     updateBalance();
 }
 
-
-// Slot per aggiungere una nuova entrata
+// Questo slot viene utilizzato per l'aggiunta di un nuovo reddito
 void MainWindow::on_actionAdd_Income_triggered() {
     int selectedIndex = accountListWidget->currentRow();
     if (selectedIndex < 0) {
-        QMessageBox::warning(this, tr("Error"), tr("No account selected."));
+        QMessageBox::warning(this, tr("Errore"), tr("Nessun account selezionato."));
         return;
     }
 
@@ -269,17 +291,18 @@ void MainWindow::on_actionAdd_Income_triggered() {
             accountContainer.addTransactionToAccount(selectedIndex, newIncome);
             updateTransactionList(selectedIndex);
         } catch (const std::out_of_range& e) {
-            qDebug() << "Error adding income: " << e.what();
-            QMessageBox::warning(this, tr("Error"), tr("Failed to add income."));
+            qDebug() << "Errore nell'aggiunta del reddito: " << e.what();
+            QMessageBox::warning(this, tr("Errore"), tr("Aggiunta del reddito non riuscito."));
         }
     }
     updateBalance();
 }
 
+// Questo slot viene utilizzato per l'aggiunta di un nuovo prestito
 void MainWindow::on_actionAdd_Loan_triggered() {
     int selectedIndex = accountListWidget->currentRow();
     if (selectedIndex < 0) {
-        QMessageBox::warning(this, tr("Error"), tr("No account selected."));
+        QMessageBox::warning(this, tr("Errore"), tr("Nessun account selezionato."));
         return;
     }
 
@@ -298,24 +321,24 @@ void MainWindow::on_actionAdd_Loan_triggered() {
             accountContainer.addTransactionToAccount(selectedIndex, newLoan);
             updateTransactionList(selectedIndex);
         } catch (const std::out_of_range& e) {
-            qDebug() << "Error adding loan: " << e.what();
-            QMessageBox::warning(this, tr("Error"), tr("Failed to add loan."));
+            qDebug() << "Errore nell'aggiunta del prestito: " << e.what();
+            QMessageBox::warning(this, tr("Errore"), tr("Aggiunta del prestito non riuscito."));
         }
     }
     updateBalance();
 }
 
 
-// Slot per rimuovere un account
+// Questo slot viene utilizzato per rimuovere un account
 void MainWindow::on_actionRemove_Account_triggered() {
     int selectedIndex = accountListWidget->currentRow();
     if (selectedIndex < 0) {
-        QMessageBox::warning(this, tr("Error"), tr("No account selected."));
+        QMessageBox::warning(this, tr("Errore"), tr("Nessun account selezionato."));
         return;
     }
 
     QMessageBox::StandardButton reply;
-    reply = QMessageBox::question(this, tr("Remove Account"), tr("Are you sure you want to remove the selected account?"),
+    reply = QMessageBox::question(this, tr("Rimuovi Account"), tr("Sei sicuro di voler rimuovere l'account selezionato?"),
     QMessageBox::Yes | QMessageBox::No);
 
     if (reply == QMessageBox::Yes) {
@@ -325,10 +348,11 @@ void MainWindow::on_actionRemove_Account_triggered() {
     updateBalance();
 }
 
+// Questo slot viene utilizzato per modificare un account
 void MainWindow::on_actionEdit_Account_triggered() {
     int selectedIndex = accountListWidget->currentRow();
     if (selectedIndex < 0 || selectedIndex >= accountContainer.getAccounts().size()) {
-        QMessageBox::warning(this, tr("Error"), tr("Nessun account selezionato."));
+        QMessageBox::warning(this, tr("Errore"), tr("Nessun account selezionato."));
         return;
     }
 
@@ -345,14 +369,13 @@ void MainWindow::on_actionEdit_Account_triggered() {
     }
 }
 
-
-
+// Questo slot viene utilizzato per rimuovere una transazione
 void MainWindow::on_actionRemove_Transaction_triggered() {
     int selectedIndex = accountListWidget->currentRow();
     int selectedTransactionIndex = transactionListWidget->currentRow();
 
     if (selectedIndex < 0 || selectedTransactionIndex < 0) {
-        QMessageBox::warning(this, tr("Error"), tr("No account or transaction selected."));
+        QMessageBox::warning(this, tr("Errore"), tr("Nessun account o transazione selezionato."));
         return;
     }
 
@@ -361,16 +384,17 @@ void MainWindow::on_actionRemove_Transaction_triggered() {
         updateTransactionList(selectedIndex);
         updateBalance();
     } catch (const std::out_of_range& e) {
-        qDebug() << "Error removing transaction: " << e.what();
-        QMessageBox::warning(this, tr("Error"), tr("Failed to remove transaction."));
+        qDebug() << "Errore nella rimozione della transazionie: " << e.what();
+        QMessageBox::warning(this, tr("Errore"), tr("Rimozione della transazione non riuscita."));
     }
 }
 
+// Questo slot viene utilizzato per modificare una transazione
 void MainWindow::on_actionEdit_Transaction_triggered() {
     int selectedAccountIndex = accountListWidget->currentRow();
     int selectedTransactionIndex = transactionListWidget->currentRow();
     if (selectedAccountIndex < 0 || selectedTransactionIndex < 0) {
-        QMessageBox::warning(this, tr("Error"), tr("No account or transaction selected."));
+        QMessageBox::warning(this, tr("Errore"), tr("Nessun account o transazione selezionato."));
         return;
     }
 
@@ -403,29 +427,30 @@ void MainWindow::on_actionEdit_Transaction_triggered() {
     updateBalance();
 }
 
-
 // Metodo per aprire un file JSON
 void MainWindow::openFile(const QString &filePath) {
+    // Tenta di leggere il file JSON specificato. Se la lettura fallisce, mostra un messaggio di errore
     if (!jsonHandler.readJson(filePath, accountContainer)) {
-        QMessageBox::critical(this, tr("Error"), tr("Impossibile aprire il file per la lettura."));
+        QMessageBox::critical(this, tr("Errore"), tr("Impossibile aprire il file per la lettura."));
         return;
     }
 
+    // Se la lettura è riuscita, salva il percorso del file e aggiorna la lista degli account
     currentFilePath = filePath;
     updateAccountList();
 }
 
-
 // Metodo per salvare un file JSON
 void MainWindow::saveFile(const QString &filePath) {
+    // Tenta di scrivere i dati nel file JSON specificato. Se la scrittura fallisce, mostra un messaggio di errore
     if (!jsonHandler.writeJson(filePath, accountContainer)) {
-        QMessageBox::critical(this, tr("Error"), tr("Non è possibile salvare il file."));
+        QMessageBox::critical(this, tr("Errore"), tr("Non è possibile salvare il file."));
         return;
     }
 
+    // Se la scrittura è riuscita, salva il percorso del file
     currentFilePath = filePath;
 }
-
 
 // Metodo per aggiornare la lista degli account
 void MainWindow::updateAccountList() {
@@ -436,13 +461,12 @@ void MainWindow::updateAccountList() {
         accountListWidget->addItem(accountDetails);
     }
 
-    qDebug() << "Account List Size: " << accountContainer.getAccounts().size();
+    qDebug() << "Dimensione Lista Account: " << accountContainer.getAccounts().size();
 }
 
-
-// Method to update the transaction list
+// Metodo per aggiornare la lista delle transazioni
 void MainWindow::updateTransactionList(int accountIndex) {
-    qDebug() << "Account Index: " << accountIndex;
+    qDebug() << "Indice Account: " << accountIndex;
     transactionListWidget->clear();
     QList<Finance*> transactions = accountContainer.getTransactions(accountIndex);
     for (const Finance* transaction : transactions) {
@@ -452,12 +476,13 @@ void MainWindow::updateTransactionList(int accountIndex) {
         } else if (dynamic_cast<const Income*>(transaction)) {
             transactionStr = " +" + QString::number(transaction->getAmount()) + ": " + transaction->getDescription();
         } else if (dynamic_cast<const Loan*>(transaction)) {
-            transactionStr = " Loan " + QString::number(transaction->getAmount()) + ": " + transaction->getDescription();
+            transactionStr = " Prestito " + QString::number(transaction->getAmount()) + ": " + transaction->getDescription();
         }
         transactionListWidget->addItem(transactionStr);
     }
 }
 
+// Metodo per aggiornare il saldo
 void MainWindow::updateBalance() {
     int selectedIndex = accountListWidget->currentRow();
     if (selectedIndex < 0) {
@@ -471,7 +496,7 @@ void MainWindow::updateBalance() {
         } else if (dynamic_cast<const Income*>(transaction)) {
             balance += transaction->getAmount();
         } else if (const Loan* loan = dynamic_cast<const Loan*>(transaction)) {
-            // For the purpose of this example, a loan reduces the balance if it is not paid
+            // In questo caso il prestito riduce il saldo se non è pagato
             if (!loan->isLoanPaid()) {
                 balance -= loan->getAmount();
             }

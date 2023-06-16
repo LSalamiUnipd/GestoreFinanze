@@ -17,6 +17,7 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
+// Classe MainWindow per l'interfaccia principale dell'applicazione
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
@@ -43,25 +44,34 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    QVBoxLayout *mainLayout;
+    QVBoxLayout *mainLayout;  // Layout principale della finestra
 
+    // Contenitori di dati e gestore di file JSON
     AccountContainer accountContainer;
     JsonHandler jsonHandler;
-    QString currentFilePath;
-    QListWidget* accountListWidget;   // List widget for accounts
-    QListWidget* transactionListWidget;   // List widget for transactions (expenses and incomes)
+    QString currentFilePath;  // Percorso del file attualmente aperto
+
+    // Widget per visualizzare gli account e le transazioni
+    QListWidget* accountListWidget;
+    QListWidget* transactionListWidget;
+
+    // Etichette per bilancio e widget
     QLabel *balanceLabel;
     QLabel *accountListWidgetLabel;
     QLabel *transactionListWidgetLabel;
+
+    // Creazione delle componenti dell'interfaccia utente
     void createActions();
     void createMenus();
     void createToolBars();
     void createStatusBar();
     void createCentralWidget();
 
+    // Menù e sottomenù
     QMenu *fileMenu;
     QMenu *editMenu;
 
+    // Azioni disponibili nei menù
     QAction *openAction;
     QAction *saveAction;
     QAction *saveAsAction;
@@ -75,10 +85,11 @@ private:
     QAction *removeTransactionAction;
     QAction *editTransactionAction;
 
+    // Barre degli strumenti
     QToolBar *fileToolBar;
     QToolBar *editToolBar;
 
-    // Metodi di supporto
+    // Metodi di supporto per aprire e salvare file, e aggiornare l'interfaccia utente
     void openFile(const QString &filePath);
     void saveFile(const QString &filePath);
     void updateAccountList();

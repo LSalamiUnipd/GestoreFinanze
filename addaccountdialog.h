@@ -6,24 +6,20 @@
 #include <QTextEdit>
 #include <QDialogButtonBox>
 
-// Dichiarazione della classe AddAccountDialog
+// Classe AddAccountDialog per aggiungere un nuovo account tramite un dialog
 class AddAccountDialog : public QDialog {
     Q_OBJECT
 
 public:
-    // Costruttore
-    explicit AddAccountDialog(QWidget *parent = nullptr);
+    explicit AddAccountDialog(QWidget *parent = nullptr); // Costruttore
 
-    // Metodo per ottenere il nome dell'account
-    QString getAccountName() const;
-
-    // Metodo per ottenere la descrizione dell'account
-    QString getAccountDescription() const;
+    QString getAccountName() const; // Ottiene il nome dell'account
+    QString getAccountDescription() const; // Ottiene la descrizione dell'account
 
 private:
-    QLineEdit *nameEdit;            // Campo di input per il nome dell'account
-    QTextEdit *descriptionEdit;     // Campo di input per la descrizione dell'account
-    QDialogButtonBox *buttonBox;    // Pulsanti di conferma e annullamento
+    QLineEdit *nameEdit; // Campo per inserire il nome dell'account
+    QTextEdit *descriptionEdit; // Campo per inserire la descrizione dell'account
+    QDialogButtonBox *buttonBox; // Pulsanti di conferma e annullamento
 };
 
 #endif // ADDACCOUNTDIALOG_H

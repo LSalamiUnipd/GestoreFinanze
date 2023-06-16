@@ -30,17 +30,17 @@ EditAccountDialog::EditAccountDialog(Account *accountToEdit, QWidget *parent)
     connect(buttonBox, &QDialogButtonBox::rejected, this, &EditAccountDialog::reject);
 }
 
-// Metodo per ottenere il nome dell'account
+// Ottiene il nome dell'account
 QString EditAccountDialog::getAccountName() const {
     return nameEdit->text();
 }
 
-// Metodo per ottenere la descrizione dell'account
+// Ottiene la descrizione dell'account
 QString EditAccountDialog::getAccountDescription() const {
     return descriptionEdit->toPlainText();
 }
 
-// Metodo che viene chiamato quando il pulsante OK viene premuto
+// Slot che viene chiamato quando il pulsante OK viene premuto
 void EditAccountDialog::accept() {
     // Aggiorna i dati dell'account con i nuovi valori inseriti
     account->setName(nameEdit->text());

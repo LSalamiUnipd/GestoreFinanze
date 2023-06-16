@@ -1,6 +1,6 @@
 #include "income.h"
 
-// Costruttore della classe Income
+// Implementazione del costruttore della classe Income
 Income::Income(const QString &description, double amount, const QDate &date)
     : Finance(description, amount, date) {
 }

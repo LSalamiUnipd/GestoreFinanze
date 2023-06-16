@@ -1,6 +1,6 @@
 #include "expense.h"
 
-// Costruttore della classe Expense
+// Implementazione del costruttore della classe Expense
 Expense::Expense(const QString &description, double amount, const QDate &date)
     : Finance(description, amount, date) {
 }

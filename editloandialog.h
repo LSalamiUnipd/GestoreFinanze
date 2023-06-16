@@ -14,12 +14,14 @@
 #include <QLabel>
 #include <loan.h>
 
+// Classe EditLoanDialog per la modifica di un oggetto Loan
 class EditLoanDialog : public QDialog {
     Q_OBJECT
 
 public:
-    explicit EditLoanDialog(Loan& loan, QWidget *parent = nullptr);
+    explicit EditLoanDialog(Loan& loan, QWidget *parent = nullptr); // Costruttore
 
+    // Getter per il Loan modificato e i suoi campi
     Loan getModifiedLoan() const;
     QString getLoanDescription() const;
     double getLoanAmount() const;
@@ -29,12 +31,14 @@ public:
     bool isLoanPaid() const;
 
 private slots:
-    void accept() override;
+    void accept() override; // Slot di accettazione del dialogo
 
 private:
+    // Riferimenti al Loan originale e a una copia modificabile dello stesso
     Loan& originalLoan;
     Loan modifiedLoan;
 
+    // Widget di input
     QLineEdit* descriptionEdit;
     QDoubleSpinBox* amountEdit;
     QDateEdit* dateEdit;

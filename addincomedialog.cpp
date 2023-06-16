@@ -2,21 +2,20 @@
 #include <QFormLayout>
 #include <QLabel>
 
-// Costruttore della classe AddIncomeDialog
+// Costruttore di AddIncomeDialog
 AddIncomeDialog::AddIncomeDialog(QWidget *parent)
-    : QDialog(parent) {
+    : QDialog(parent),
+    descriptionEdit(new QLineEdit(this)),
+    amountEdit(new QDoubleSpinBox(this)),
+    dateEdit(new QDateEdit(QDate::currentDate(), this)),
+    buttonBox(new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this)) {
+
     setWindowTitle("Aggiungi Entrata");
 
-    // Inizializzazione dei widget di input e dei pulsanti
-    descriptionEdit = new QLineEdit(this);
-    amountEdit = new QDoubleSpinBox(this);
     amountEdit->setMinimum(0);
     amountEdit->setMaximum(9999999);
     amountEdit->setDecimals(2);
-    dateEdit = new QDateEdit(QDate::currentDate(), this);
-    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
 
-    // Layout e aggiunta dei widget
     QFormLayout *formLayout = new QFormLayout;
     formLayout->addRow(new QLabel("Descrizione:"), descriptionEdit);
     formLayout->addRow(new QLabel("Importo:"), amountEdit);
@@ -30,17 +29,17 @@ AddIncomeDialog::AddIncomeDialog(QWidget *parent)
     connect(buttonBox, &QDialogButtonBox::rejected, this, &AddIncomeDialog::reject);
 }
 
-// Metodo per ottenere la descrizione dell'entrata
+// Ottiene la descrizione del reddito
 QString AddIncomeDialog::getIncomeDescription() const {
     return descriptionEdit->text();
 }
 
-// Metodo per ottenere l'importo dell'entrata
+// Ottiene l'importo del reddito
 double AddIncomeDialog::getIncomeAmount() const {
     return amountEdit->value();
 }
 
-// Metodo per ottenere la data dell'entrata
+// Ottiene la data del reddito
 QDate AddIncomeDialog::getIncomeDate() const {
     return dateEdit->date();
 }
