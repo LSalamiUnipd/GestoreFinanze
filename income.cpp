@@ -9,3 +9,11 @@ Income::Income(const QString &description, double amount, const QDate &date)
 QString Income::getType() const {
     return "Income";
 }
+
+// Implementazione del metodo performOperation() per Income
+void Income::performOperation() const{
+    // Operazioni specifiche per un'entrata
+    // Esempio: Calcola l'imposta sul reddito per l'entrata
+    double irpef = getAmount() * 0.2;
+    qDebug() << "L'imposta sul reddito per l'entrata di" << getDescription() << "è di" << irpef;
+}

@@ -39,3 +39,11 @@ void Loan::setLoanPaid(bool isPaid) {
 QString Loan::getType() const {
     return "Loan";
 }
+
+// Implementazione del metodo performOperation() per Loan
+void Loan::performOperation() const{
+    // Operazioni specifiche per un prestito
+    // Esempio: Calcola l'interesse del prestito
+    double interest = getAmount() * 0.05;
+    qDebug() << "L'interesse per il prestito di" << getDescription() << "è di" << interest;
+}

@@ -11,6 +11,8 @@ public:
 
     // Implementazione del metodo virtuale puro per ottenere il tipo di transazione finanziaria
     QString getType() const override;
+    // Metodo per eseguire operazioni specifiche per una transazione finanziaria
+    void performOperation() const override;
 };
 
 #endif // EXPENSE_H

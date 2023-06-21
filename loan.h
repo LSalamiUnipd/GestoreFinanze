@@ -24,6 +24,8 @@ public:
 
     // Implementazione del metodo per ottenere il tipo di transazione finanziaria
     QString getType() const override;
+    // Metodo per eseguire operazioni specifiche per una transazione finanziaria
+    void performOperation() const override;
 
 private:
     int duration; // Durata del prestito in mesi

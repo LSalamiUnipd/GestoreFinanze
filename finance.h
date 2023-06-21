@@ -25,6 +25,8 @@ public:
 
     // Metodo virtuale puro per ottenere il tipo di transazione finanziaria
     virtual QString getType() const = 0;
+    // Metodo virtuale per eseguire operazioni specifiche per una transazione finanziaria
+    virtual void performOperation() const = 0;
 
 private:
     QString description; // Descrizione dell'operazione finanziaria
